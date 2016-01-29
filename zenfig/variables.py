@@ -12,8 +12,10 @@ Variables processor
 """
 
 import yaml
+import re
 import os
 
+from . import log
 
 def get_vars(*, var_files):
     """Collect all variables taken from all files in var_files
@@ -33,11 +35,13 @@ def get_vars(*, var_files):
 
         # Normalize full path to file
         var_file = os.path.abspath(var_file)
+        log.msg("Attempting to read from '{}'".format(var_file))
 
         # The entry is in fact a file
         # thus, to load it directly I must
-        if os.path.isfile(var_file):
+        if os.path.isfile(var_file) and re.match("/.*\.yml$", var_file):
             with open(var_file, 'r') as f:
+                log.msg_debug("Found variable file: {}".format(var_file))
                 tpl_vars.update(yaml.load(f))
 
         # The entry is a directory
@@ -45,11 +49,12 @@ def get_vars(*, var_files):
 
             # First of all, list all files inside of this directory
             # and merge their values with tpl_vars
+            next_var_files = []
             for next_var_file in os.listdir(var_file):
                 next_var_file = os.path.join(var_file, next_var_file)
                 if os.path.isfile(next_var_file):
-                    with open(next_var_file, 'r') as f:
-                        tpl_vars.update(yaml.load(f))
+                    next_var_files.append(next_var_file)
+            tpl_vars.update(get_vars(var_files=next_var_files))
 
     # Return the final result
     return tpl_vars

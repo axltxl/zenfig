@@ -1,4 +1,4 @@
 [hello]
-{% for i in range(9) %}
-    {{- message }}
-{% endfor %}
+message = {{ message }}
+home = {{ env['HOME'] }}
+color_hex_normalize = {{ color_hex_normalize('#fff') }}

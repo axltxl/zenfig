@@ -11,12 +11,13 @@ Main module
 
 """
 
-from docopt import docopt
-from colour import Color
-from docopt import DocoptExit
 import sys
 import os
 import time
+import traceback
+from docopt import docopt
+from colour import Color
+from docopt import DocoptExit
 from zenfig import renderer
 from zenfig import log
 from zenfig import variables
@@ -46,7 +47,7 @@ def start(*, options):
     log.msg("All variable files have been read.")
     log.msg("----------------------------------")
     for key, value in vars.items():
-        log.msg("{:10} => {}".format(key, value), bold=True)
+        log.msg("{:10} => '{}'".format(key, value), bold=True)
     log.msg("----------------------------------")
 
     log.msg("Rendering template ...")
