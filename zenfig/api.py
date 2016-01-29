@@ -12,9 +12,19 @@ API for templates
 """
 
 # TODO: you know how to revamp this, give it some time
+import webcolors
 from . import log
 
-def _api_some_fun():
+def _api_hex_normalize(color):
+    """
+       Normalize a hexadecimal color value to a string #
+       followed by six lowercase hexadecimal digits (what
+       HTML5 terms a “valid lowercase simple color”).<Paste>
+    """
+    webcolors.normalize_hex(color):
+
+
+def _api_hex_to_rgb(color):
     pass
 
 def _register(jinja_env, key, value):
@@ -22,4 +32,5 @@ def _register(jinja_env, key, value):
     jinja_env.globals[key] = value
 
 def register(jinja_env):
-    _register(jinja_env, 'zenfig_some_fun', _api_some_fun)
+    _register(jinja_env, 'color_hex_normalize', _api_hex_normalize)
+    _register(jinja_env, 'color_hex_to_rgb',    _api_hex_to_rgb)
