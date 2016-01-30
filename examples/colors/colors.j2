@@ -1,0 +1,16 @@
+{#
+#######################################
+# This template shows you
+# all colors in colors.yml and how they
+# are manipulated
+#######################################
+#}
+[colors_hex]
+{% for key, color in colors.items() %}
+    {{- "base{:2}".format(key) }} = {{ color_normalize_hex(color) }}
+{% endfor %}
+
+[colors_rgb]
+{% for key, color in colors.items() %}
+    {{- "base{:02d}".format(key|int) }} = {{ "['{}', '{}', '{}']".format(*color_hex_to_rgb(color)) }}
+{% endfor %}
