@@ -14,6 +14,7 @@ Template renderer
 import os
 import jinja2
 
+from . import __name__ as pkg_name
 from . import log
 from . import api
 
