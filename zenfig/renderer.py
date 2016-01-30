@@ -35,8 +35,11 @@ def render(*, vars, template_file):
     # set user's environment variables inside globals
     tpl_env.globals['env'] = os.environ
 
+    ############################
     # register all API functions
-    api.register(tpl_env)
+    ############################
+    for api_entry, api_func in api.get_map().items():
+        tpl_env.globals[api_entry] = api_func
 
     # load the template
     tpl = tpl_env.get_template(template_file)
