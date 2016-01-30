@@ -43,9 +43,19 @@ def render(*, vars, template_file):
     ####################################################
     # zenfig will look for templates on this directories
     ####################################################
+
+    # XDG_DATA_HOME/zenfig/templates is inside
+    # the template search path
+    xdg_data_home = os.getenv('XDG_DATA_HOME')
+    if xdg_data_home is None:
+        xdg_data_home = "{}/.local/share".format(os.getenv("HOME"))
+    xdg_template_directory = "{}/{}/templates".format(xdg_data_home, pkg_name)
+
+    # Construct the actual search path
     tpl_searchpath = [
             os.getcwd(), # relative to current working directory
             os.path.dirname(template_file),  # relative to template's directory
+            xdg_template_directory,
             '/',  # absolute paths
             ]
     log.msg_debug("Template search path")
