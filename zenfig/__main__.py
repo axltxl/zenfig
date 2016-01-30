@@ -50,7 +50,7 @@ def start(*, options):
         log.msg("{:10} => '{}'".format(key, value), bold=True)
     log.msg("**********************************")
 
-    log.msg("Rendering template ...")
+    # Render that template!
     renderer.render(vars=vars, template_file=template_file)
 
     dt = time.time() - start_time

@@ -54,4 +54,5 @@ def render(*, vars, template_file):
     tpl = tpl_env.get_template(template_file)
 
     # render template to stdout
+    log.msg("Rendering template ...")
     print(tpl.render(**vars))
