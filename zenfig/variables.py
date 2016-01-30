@@ -37,9 +37,10 @@ def get_vars(*, var_files):
         var_file = os.path.abspath(var_file)
         log.msg("Attempting to read from '{}'".format(var_file))
 
-        # The entry is in fact a file
-        # thus, to load it directly I must
-        if os.path.isfile(var_file) and re.match("/.*\.yml$", var_file):
+        # The entry is in fact a file, thus, to load it directly I must
+        # Only files with .yaml and .yml will be taken into account
+        if os.path.isfile(var_file) and \
+        re.match("/.*\.yaml$", var_file) or re.match("/.*\.yml$", var_file):
             with open(var_file, 'r') as f:
                 log.msg_debug("Found variable file: {}".format(var_file))
                 tpl_vars.update(yaml.load(f))
