@@ -24,8 +24,19 @@ def render(*, vars, template_file):
     :template_file: path to the template file
     """
 
+    ####################################################
+    # zenfig will look for templates on this directories
+    ####################################################
+    tpl_searchpath = [
+            os.getcwd(), # relative to current working directory
+            os.dirname(template_file),  # relative to template's directory
+            '/',  # absolute paths
+            ]
+
+    ###########################
     # load template environment
-    tpl_loader = jinja2.FileSystemLoader(os.getcwd())
+    ###########################
+    tpl_loader = jinja2.FileSystemLoader(tpl_searchpath)
 
     # everything begins with a jinja environment
     tpl_env = jinja2.Environment(loader=tpl_loader, trim_blocks=True)
