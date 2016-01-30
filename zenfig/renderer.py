@@ -13,6 +13,8 @@ Template renderer
 
 import os
 import jinja2
+
+from . import log
 from . import api
 
 
