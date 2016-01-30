@@ -24,14 +24,31 @@ def render(*, vars, template_file):
     :template_file: path to the template file
     """
 
+    # Make sure we have the absolute path to the template file
+    template_file = os.path.abspath(template_file)
+
+    ##############################################
+    # A directory instead of a single file can
+    # be specified. In this case, zenfig will
+    # look for a file named main.j2 inside that
+    # directory
+    ##############################################
+    if os.path.isdir(template_file):
+        template_file = "{}/main.j2".format(template_file)
+        log.msg_warn("You have specified a template directory")
+        log.msg_warn("I'm gonna look for {}".format(template_file))
+
     ####################################################
     # zenfig will look for templates on this directories
     ####################################################
     tpl_searchpath = [
             os.getcwd(), # relative to current working directory
-            os.dirname(template_file),  # relative to template's directory
+            os.path.dirname(template_file),  # relative to template's directory
             '/',  # absolute paths
             ]
+    log.msg_debug("Template search path")
+    for search_path in tpl_searchpath:
+        log.msg_debug(search_path)
 
     ###########################
     # load template environment
