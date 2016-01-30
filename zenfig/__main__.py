@@ -6,7 +6,7 @@ zenfig.main
 
 Main module
 
-:copyright: (c) 2015 by Alejandro Ricoveri
+:copyright: (c) 2016 by Alejandro Ricoveri
 :license: MIT, see LICENSE for more details.
 
 """
@@ -45,10 +45,10 @@ def start(*, options):
     vars = variables.get_vars(var_files=var_files)
 
     log.msg("All variable files have been read.")
-    log.msg("----------------------------------")
+    log.msg("**********************************")
     for key, value in vars.items():
         log.msg("{:10} => '{}'".format(key, value), bold=True)
-    log.msg("----------------------------------")
+    log.msg("**********************************")
 
     log.msg("Rendering template ...")
     renderer.render(vars=vars, template_file=template_file)

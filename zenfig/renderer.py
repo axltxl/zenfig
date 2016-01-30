@@ -6,7 +6,7 @@ zenfig.renderer
 
 Template renderer
 
-:copyright: (c) 2015 by Alejandro Ricoveri
+:copyright: (c) 2016 by Alejandro Ricoveri
 :license: MIT, see LICENSE for more details.
 
 """
@@ -17,13 +17,11 @@ from . import api
 
 
 def render(*, vars, template_file):
-    """Render a jinja2 template
+    """
+    Render a jinja2 template
 
-    :*: TODO
-    :vars: TODO
-    :template_file: TODO
-    :returns: TODO
-
+    :vars: a dictionary containing all variables to be injected into the template
+    :template_file: path to the template file
     """
 
     # load template environment
