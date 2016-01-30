@@ -58,7 +58,13 @@ def render(*, vars, template_file):
             xdg_template_directory,
             '/',  # absolute paths
             ]
-    log.msg_debug("Template search path")
+
+    # There are cases in which duplicate entries
+    # inside the template search path could actually exist,
+    # e.g. cwd and template directory are the same
+    tpl_searchpath = sorted(set(tpl_searchpath), key=lambda x: tpl_searchpath.index(x))
+
+    log.msg_debug("Template search path:")
     for search_path in tpl_searchpath:
         log.msg_debug(search_path)
 
