@@ -1,2 +1,2 @@
 #!/bin/sh
-PYTHONPATH="../.." python3 -m zenfig -I . colors.j2
+PYTHONPATH="../.." python3 -m zenfig -I . .
