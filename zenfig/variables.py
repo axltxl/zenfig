@@ -23,8 +23,13 @@ def normalize_search_path(var_files):
     Normalize variable search path
 
     :param var_files: Raw list of variable locations
-    :returns: A normalized list of variable locations/files
+    :returns: A normalized list of variable locations/files, ordered by precedence
     """
+
+    ########################################
+    # Variable locations are set by order of
+    # precedence as follows
+    ########################################
 
     #####################################
     # 1 => Variables set by the user
@@ -57,7 +62,7 @@ def normalize_search_path(var_files):
     var_files.append(xdg_variables_dir)
 
     # Make sure there are no duplicates in this one
-    return sorted(set(var_files), key=lambda x: var_files.index(x))
+    return sorted(set(var_files), key=lambda x: var_files.index(x))[::-1]
 
 def get_vars(*, var_files):
     """
