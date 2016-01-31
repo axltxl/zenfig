@@ -22,6 +22,8 @@ from docopt import DocoptExit
 from zenfig import renderer
 from zenfig import log
 from zenfig import variables
+from zenfig import PKG_URL as pkg_url
+from zenfig import __name__ as pkg_name, __version__ as pkg_version
 
 def parse_args(argv):
     """Usage: zenfig [-I <varfile>]... <template_file>
@@ -29,7 +31,7 @@ def parse_args(argv):
     -I <varfile>, --include <varfile>  Variables file/directory to include
     """
 
-    return docopt(parse_args.__doc__, argv=argv)
+    return docopt(parse_args.__doc__, argv=argv, version=pkg_version)
 
 
 def start(*, options):
