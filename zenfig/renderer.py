@@ -19,7 +19,34 @@ from . import api
 from . import util
 
 
-def render(*, vars, template_file):
+def render_dict(vars):
+    """
+    Render a jinja2-flavored dictionary with itself
+
+    :vars: A dictionary containing expected-to-be jinja2 strings
+    :returns: A dictionary whose string values have been rendered with jinja2
+    """
+
+    ###########################
+    # Load template environment
+    ###########################
+    tpl_env = jinja2.Environment(loader=jinja2.DictLoader(vars),)
+
+    #############################################
+    # Strings found in this dict will be rendered
+    # using this same dict as its variables
+    # In this fashion, YAML files can have jinja2
+    # logic as well, thus, variables in YAML can
+    # reference other variables
+    #############################################
+    for tpl_name, tpl_value in vars.items():
+        if isinstance(tpl_value, str):
+            vars[tpl_name] = tpl_env.get_template(tpl_name).render(**vars)
+
+    # Give back rendered variables
+    return vars
+
+def render_file(*, vars, template_file, output_file):
     """
     Render a jinja2 template
 

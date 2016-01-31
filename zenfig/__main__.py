@@ -75,7 +75,8 @@ def start(*, options):
     template_file = options['<template_file>']
 
     # Obtain variables from variable files
-    vars = variables.get_vars(var_files=var_files)
+    vars, files = variables.get_vars(var_files=var_files)
+    vars = renderer.render_dict(vars)
 
     # Print vars
     log.msg("All variable files have been read.")
