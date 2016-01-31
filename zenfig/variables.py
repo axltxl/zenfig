@@ -19,22 +19,24 @@ from . import log
 from . import util
 
 def normalize_search_path(var_files):
-    """Normalize variable search path"""
+    """
+    Normalize variable search path
 
+    :param var_files: Raw list of variable locations
+    :returns: A normalized list of variable locations/files
+    """
+
+    #####################################
+    # 1 => Variables set by the user
     # Make sure we have absolute paths to
     # all variable files and/or directories
+    #####################################
     for i in range(len(var_files)):
         var_files[i] = os.path.abspath(var_files[i])
 
-    ########################################
-    # Add XDG_DATA_HOME/zenfig/vars into the
-    # search path
-    ########################################
-    xdg_variables_dir = "{}/vars".format(util.get_xdg_data_home())
-    var_files.append(xdg_variables_dir)
-
     ################################
-    # Add entries in ZENFIG_VAR_PATH:
+    # 2 => Variables set in ZF_VAR_PATH
+    # Add entries in ZF_VAR_PATH:
     # Should this environment variable
     # be set, then it will be taken into
     # account for variables search path
@@ -46,14 +48,23 @@ def normalize_search_path(var_files):
         for env_var_file in env_var_files:
             var_files.append(env_var_file)
 
+    ########################################
+    # 3 => Variables set in default vars dir
+    # Add XDG_DATA_HOME/zenfig/vars into the
+    # search path
+    ########################################
+    xdg_variables_dir = "{}/vars".format(util.get_xdg_data_home())
+    var_files.append(xdg_variables_dir)
+
     # Make sure there are no duplicates in this one
     return sorted(set(var_files), key=lambda x: var_files.index(x))
 
 def get_vars(*, var_files):
-    """Collect all variables taken from all files in var_files
+    """
+    Collect all variables taken from all files in var_files
 
-    Kwargs:
-        var_files(list): list of files/directories to be sourced
+    :param var_files: list of files/directories to be sourced
+    :returns: A dictionary containing all variables collected from all set locations
     """
 
     # All merged variables will go in here

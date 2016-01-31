@@ -14,7 +14,6 @@ Template renderer
 import os
 import jinja2
 
-from . import __name__ as pkg_name
 from . import log
 from . import api
 from . import util
@@ -48,8 +47,8 @@ def render(*, vars, template_file):
 
     # XDG_DATA_HOME/zenfig/templates is inside
     # the template search path
-    xdg_template_directory = "{}/{}/templates".format(
-        util.get_xdg_data_home(), pkg_name
+    xdg_template_directory = "{}/templates".format(
+        util.get_xdg_data_home()
     )
 
     # Construct the actual search path
