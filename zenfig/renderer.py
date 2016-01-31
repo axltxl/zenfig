@@ -101,10 +101,11 @@ def render_file(*, vars, template_file, output_file):
     ###########################
     # load template environment
     ###########################
-    tpl_loader = jinja2.FileSystemLoader(tpl_searchpath)
-
-    # everything begins with a jinja environment
-    tpl_env = jinja2.Environment(loader=tpl_loader, trim_blocks=True)
+    tpl_env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(tpl_searchpath),
+        trim_blocks=True,
+        keep_trailing_newline=True
+    )
 
     # set user's environment variables inside globals
     tpl_env.globals['env'] = os.environ
