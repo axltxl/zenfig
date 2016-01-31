@@ -23,7 +23,7 @@ from zenfig import log
 from zenfig import variables
 
 def parse_args(argv):
-    """Usage: zenfig (-I <varfile>)... <template_file>
+    """Usage: zenfig [-I <varfile>]... <template_file>
 
     -I <varfile>, --include <varfile>  Variables file/directory to include
     """
