@@ -26,10 +26,27 @@ def normalize_search_path(var_files):
     for i in range(len(var_files)):
         var_files[i] = os.path.abspath(var_files[i])
 
+    ########################################
     # Add XDG_DATA_HOME/zenfig/vars into the
     # search path
+    ########################################
     xdg_variables_dir = "{}/vars".format(util.get_xdg_data_home())
     var_files.append(xdg_variables_dir)
+
+    ################################
+    # Add entries in ZENFIG_VAR_PATH:
+    # Should this environment variable
+    # be set, then it will be taken into
+    # account for variables search path
+    ################################
+    env_var_path = os.getenv("ZF_VAR_PATH")
+    if env_var_path is not None:
+        log.msg_warn("ZF_VAR_PATH has been set!")
+        env_var_files = env_var_path.split(":")
+        for env_var_file in env_var_files:
+            var_files.append(env_var_file)
+
+    # Make sure there are no duplicates in this one
     return sorted(set(var_files), key=lambda x: var_files.index(x))
 
 def get_vars(*, var_files):
