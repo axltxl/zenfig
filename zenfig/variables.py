@@ -69,11 +69,17 @@ def get_vars(*, var_files):
     Collect all variables taken from all files in var_files
 
     :param var_files: list of files/directories to be sourced
-    :returns: A dictionary containing all variables collected from all set locations
+    :returns:
+        A tuple with two dicts, one containing variables
+        and the other one containing locations where they were
+        ultimately set (following precedence set by normalize_search_path)
     """
 
+    ######################################
     # All merged variables will go in here
-    tpl_vars = {}
+    ######################################
+    tpl_vars = {}  # variables themselves
+    tpl_files = {}  # locations in which these vars were set will go in here
 
     #############################################################
     # iterate through all entries and see whether or not they're
@@ -83,7 +89,6 @@ def get_vars(*, var_files):
 
         # Normalize full path to file
         var_file = os.path.abspath(var_file)
-        log.msg("Attempting to read from '{}'".format(var_file))
 
         # The entry is in fact a file, thus, to load it directly I must
         # Only files with .yaml and .yml will be taken into account
@@ -91,7 +96,17 @@ def get_vars(*, var_files):
         re.match("/.*\.yaml$", var_file) or re.match("/.*\.yml$", var_file):
             with open(var_file, 'r') as f:
                 log.msg_debug("Found variable file: {}".format(var_file))
-                tpl_vars.update(yaml.load(f))
+                log.msg("Reading variables from '{}'".format(var_file))
+
+                # Update variables with those found
+                # on this file
+                vars = yaml.load(f)
+                tpl_vars.update(vars)
+
+                # And update locations in which these
+                # variables were found
+                for var in vars.keys():
+                    tpl_files[var] = var_file
 
         # The entry is a directory
         elif os.path.isdir(var_file):
@@ -103,8 +118,14 @@ def get_vars(*, var_files):
                 next_var_file = os.path.join(var_file, next_var_file)
                 if os.path.isfile(next_var_file):
                     next_var_files.append(next_var_file)
-            tpl_vars.update(get_vars(var_files=next_var_files))
+
+            # Get both variables and locations
+            vars, files = get_vars(var_files=next_var_files)
+
+            # ... and merge them with the current
+            tpl_vars.update(vars)
+            tpl_files.update(files)
 
     # Return the final result
-    return tpl_vars
+    return tpl_vars, tpl_files
 

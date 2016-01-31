@@ -65,7 +65,9 @@ def start(*, options):
     # measure execution time properly
     start_time = time.time()
 
-    # options passed from the command line
+    ##########################
+    # Get variables themselves
+    ##########################
     var_files = variables.normalize_search_path(options['--include'])
     log.msg_debug("Variables search path:")
     log.msg_debug("**********************")
@@ -82,7 +84,7 @@ def start(*, options):
     log.msg("All variable files have been read.")
     log.msg("**********************************")
     for key, value in vars.items():
-        log.msg("{:>16} => '{}'".format(key, value), bold=True)
+        log.msg("{:16} => '{}' [{}]".format(key, value, files[key]), bold=True)
     log.msg("**********************************")
 
     #######################
