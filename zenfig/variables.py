@@ -18,6 +18,24 @@ import os
 from . import log
 from . import util
 
+
+# Sanity check regex for ZF_VAR_PATH
+ZF_VAR_PATH_REGEX = "([^:]+:)*[^:]+$"
+
+def _get_vars_from_env(var_path=None):
+    """
+    Get variable search paths from environment variable ZF_VAR_PATH (if any)
+
+    :param var_path: optional var_path string
+    """
+
+    if var_path is None:
+        var_path = os.getenv("ZF_VAR_PATH")
+    if var_path is not None and re.match(ZF_VAR_PATH_REGEX, var_path):
+        log.msg_debug("ZF_VAR_PATH has been set!")
+        return var_path.split(':')
+    return None
+
 def normalize_search_path(var_files):
     """
     Normalize variable search path
@@ -46,12 +64,9 @@ def normalize_search_path(var_files):
     # be set, then it will be taken into
     # account for variables search path
     ################################
-    env_var_path = os.getenv("ZF_VAR_PATH")
-    if env_var_path is not None:
-        log.msg_warn("ZF_VAR_PATH has been set!")
-        env_var_files = env_var_path.split(":")
-        for env_var_file in env_var_files:
-            var_files.append(env_var_file)
+    vars_env = _get_vars_from_env()
+    if vars_env is not None:
+        var_files.extend(vars_env)
 
     ########################################
     # 3 => Variables set in default vars dir
