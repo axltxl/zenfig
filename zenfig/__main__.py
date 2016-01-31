@@ -34,12 +34,26 @@ def parse_args(argv):
     return docopt(parse_args.__doc__, argv=argv, version=pkg_version)
 
 
+def _splash():
+    """Print the splash"""
+    splash_title = "{pkg} [{version}] - {url}".format(
+        pkg=pkg_name, version=pkg_version, url=pkg_url)
+    log.to_stdout(splash_title, colorf=log.yellow, bold=True)
+    log.to_stdout('-' * len(splash_title), colorf=log.yellow, bold=True)
+    log.to_stdout(
+        "Please, report issues to {}/issues"
+        .format(pkg_url), colorf=log.yellow, bold=True
+    )
+
 def start(*, options):
     """
     The main thing
 
     :param options: list of arguments
     """
+
+    # Show splash
+    _splash()
 
     # measure execution time properly
     start_time = time.time()
