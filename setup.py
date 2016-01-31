@@ -27,7 +27,7 @@ desc = "Generic configuration files through the power of Jinja2"
 setup(
     name=pkg_name,
     version=version,
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     author=author,
     author_email="alejandroricoveri@gmail.com",
     description=desc,
@@ -53,5 +53,7 @@ setup(
             'zenfig = zenfig.__main__:main',
         ],
     },
+    tests_require = ['nose >= 1.3'],
+    test_suite="nose.collector",
     install_requires = reqs,
 )
