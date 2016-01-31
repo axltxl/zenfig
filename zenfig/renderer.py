@@ -24,8 +24,8 @@ def render(*, vars, template_file):
     """
     Render a jinja2 template
 
-    :vars: a dictionary containing all variables to be injected into the template
-    :template_file: path to the template file
+    :param vars: a dictionary containing all variables to be injected into the template
+    :param template_file: path to the template file
     """
 
     # Make sure we have the absolute path to the template file

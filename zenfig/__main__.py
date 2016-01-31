@@ -15,8 +15,9 @@ import sys
 import os
 import time
 import traceback
+
 from docopt import docopt
-from colour import Color
+
 from docopt import DocoptExit
 from zenfig import renderer
 from zenfig import log
@@ -32,7 +33,11 @@ def parse_args(argv):
 
 
 def start(*, options):
-    """the main thing"""
+    """
+    The main thing
+
+    :param options: list of arguments
+    """
 
     # measure execution time properly
     start_time = time.time()
@@ -49,10 +54,11 @@ def start(*, options):
     # Obtain variables from variable files
     vars = variables.get_vars(var_files=var_files)
 
+    # Print vars
     log.msg("All variable files have been read.")
     log.msg("**********************************")
     for key, value in vars.items():
-        log.msg("{:10} => '{}'".format(key, value), bold=True)
+        log.msg("{:>16} => '{}'".format(key, value), bold=True)
     log.msg("**********************************")
 
     # Render that template!
