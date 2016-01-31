@@ -30,6 +30,7 @@ def parse_args(argv):
 
     return docopt(parse_args.__doc__, argv=argv)
 
+
 def start(*, options):
     """the main thing"""
 
@@ -37,11 +38,15 @@ def start(*, options):
     start_time = time.time()
 
     # options passed from the command line
-    var_files = options['--include']
+    var_files = variables.normalize_search_path(options['--include'])
+    log.msg_debug("Variables search path:")
+    log.msg_debug("**********************")
+    for vf in var_files:
+        log.msg_debug(vf)
+    log.msg_debug("**********************")
     template_file = options['<template_file>']
 
     # Obtain variables from variable files
-    log.msg_debug("tpl_var_files = {}".format(var_files))
     vars = variables.get_vars(var_files=var_files)
 
     log.msg("All variable files have been read.")

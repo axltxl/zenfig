@@ -17,6 +17,7 @@ import jinja2
 from . import __name__ as pkg_name
 from . import log
 from . import api
+from . import util
 
 
 def render(*, vars, template_file):
@@ -47,10 +48,9 @@ def render(*, vars, template_file):
 
     # XDG_DATA_HOME/zenfig/templates is inside
     # the template search path
-    xdg_data_home = os.getenv('XDG_DATA_HOME')
-    if xdg_data_home is None:
-        xdg_data_home = "{}/.local/share".format(os.getenv("HOME"))
-    xdg_template_directory = "{}/{}/templates".format(xdg_data_home, pkg_name)
+    xdg_template_directory = "{}/{}/templates".format(
+        util.get_xdg_data_home(), pkg_name
+    )
 
     # Construct the actual search path
     tpl_searchpath = [
@@ -66,8 +66,10 @@ def render(*, vars, template_file):
     tpl_searchpath = sorted(set(tpl_searchpath), key=lambda x: tpl_searchpath.index(x))
 
     log.msg_debug("Template search path:")
+    log.msg_debug("*********************")
     for search_path in tpl_searchpath:
         log.msg_debug(search_path)
+    log.msg_debug("*********************")
 
     ###########################
     # load template environment

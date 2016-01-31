@@ -16,6 +16,21 @@ import re
 import os
 
 from . import log
+from . import util
+
+def normalize_search_path(var_files):
+    """Normalize variable search path"""
+
+    # Make sure we have absolute paths to
+    # all variable files and/or directories
+    for i in range(len(var_files)):
+        var_files[i] = os.path.abspath(var_files[i])
+
+    # Add XDG_DATA_HOME/zenfig/vars into the
+    # search path
+    xdg_variables_dir = "{}/vars".format(util.get_xdg_data_home())
+    var_files.append(xdg_variables_dir)
+    return sorted(set(var_files), key=lambda x: var_files.index(x))
 
 def get_vars(*, var_files):
     """Collect all variables taken from all files in var_files
