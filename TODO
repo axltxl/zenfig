@@ -1,0 +1,3 @@
+* Implement quiet mode, which must be the default, to be loud, use -p --print
+* Optional -o <file> instead of printing to stdout
+* Sanity checks on ZF_VAR_PATH, make sure it comes with the proper format
