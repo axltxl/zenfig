@@ -17,8 +17,8 @@ import time
 import traceback
 
 from docopt import docopt
-
 from docopt import DocoptExit
+
 from zenfig import renderer
 from zenfig import log
 from zenfig import variables
@@ -96,8 +96,8 @@ def start(*, options):
         output_file=output_file
     )
 
-    dt = time.time() - start_time
-    log.msg("Done! ({:.3f} ms)".format(dt*1000))
+    # Measure execution time
+    log.msg("Done! ({:.3f} ms)".format((time.time() - start_time)*1000))
 
 def _handle_except(e):
     """
@@ -124,8 +124,6 @@ def main(argv=None):
     # Exit code
     exit_code = 0
 
-    # Log initalization should take place before anything else
-    log.init()
 
     # First, we change main() to take an optional 'argv'
     # argument, which allows us to call it from the interactive
@@ -138,7 +136,7 @@ def main(argv=None):
         options = parse_args(argv)
 
         # start the thing!
-        start(options=options)
+        start(options=parse_args(argv))
     except DocoptExit as dexcept:
 
         # Deal with wrong arguments
