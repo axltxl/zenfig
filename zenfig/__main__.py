@@ -29,6 +29,8 @@ def parse_args(argv):
     """Usage: zenfig [-I <varfile>]... <template_file>
 
     -I <varfile>, --include <varfile>  Variables file/directory to include
+    -v  Output verbosity
+    -o FILE, --output-file FILE  Output file
     """
 
     return docopt(parse_args.__doc__, argv=argv, version=pkg_version)
@@ -51,6 +53,11 @@ def start(*, options):
 
     :param options: list of arguments
     """
+
+    # Log initalization should take place
+    # before anything else
+    quiet_stdout = not bool(options['-v'])
+    log.init(quiet_stdout=quiet_stdout)
 
     # Show splash
     _splash()
