@@ -26,7 +26,7 @@ from zenfig import PKG_URL as pkg_url
 from zenfig import __name__ as pkg_name, __version__ as pkg_version
 
 def parse_args(argv):
-    """Usage: zenfig [-I <varfile>]... <template_file>
+    """Usage: zenfig [-v]... [-I <varfile>]... [-o <file>] <template_file>
 
     -I <varfile>, --include <varfile>  Variables file/directory to include
     -v  Output verbosity
