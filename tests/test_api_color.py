@@ -8,24 +8,24 @@ from nose.tools import raises, eq_, ok_, assert_raises
 from zenfig.api import color
 
 
-def test_color_hex_normalize():
+def test_color_normalize_hex():
     # Valid colors
-    eq_(color.hex_normalize("#fff"),   "#ffffff")
-    eq_(color.hex_normalize("a1a1fd"), "#a1a1fd")
-    eq_(color.hex_normalize("13d4a2"), "#13d4a2")
-    eq_(color.hex_normalize("fff"),    "#ffffff")
+    eq_(color.normalize_hex("#fff"),   "#ffffff")
+    eq_(color.normalize_hex("a1a1fd"), "#a1a1fd")
+    eq_(color.normalize_hex("13d4a2"), "#13d4a2")
+    eq_(color.normalize_hex("fff"),    "#ffffff")
 
     # Invalid colors
-    eq_(color.hex_normalize("ffff"),    None)
-    eq_(color.hex_normalize("affffs"),    None)
-    eq_(color.hex_normalize(""),    None)
-    eq_(color.hex_normalize("##ffff"),  None)
-    eq_(color.hex_normalize("#rfff54"), None)
+    eq_(color.normalize_hex("ffff"),    None)
+    eq_(color.normalize_hex("affffs"),    None)
+    eq_(color.normalize_hex(""),    None)
+    eq_(color.normalize_hex("##ffff"),  None)
+    eq_(color.normalize_hex("#rfff54"), None)
 
     # Invalid types
-    eq_(color.hex_normalize(123), None)
-    eq_(color.hex_normalize(True), None)
-    eq_(color.hex_normalize(set([1,2,3])), None)
+    eq_(color.normalize_hex(123), None)
+    eq_(color.normalize_hex(True), None)
+    eq_(color.normalize_hex(set([1,2,3])), None)
 
 def test_color_hex_to_rgb():
     # Valid colors

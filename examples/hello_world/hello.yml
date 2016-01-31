@@ -1,0 +1,4 @@
+---
+message: '{{ hello  }} {{ world }}'
+hello: Hello
+world: WORLD!

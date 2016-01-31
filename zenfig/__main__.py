@@ -15,46 +15,89 @@ import sys
 import os
 import time
 import traceback
+
 from docopt import docopt
-from colour import Color
 from docopt import DocoptExit
+
 from zenfig import renderer
 from zenfig import log
 from zenfig import variables
+from zenfig import PKG_URL as pkg_url
+from zenfig import __name__ as pkg_name, __version__ as pkg_version
 
 def parse_args(argv):
-    """Usage: zenfig (-I <varfile>)... <template_file>
+    """Usage: zenfig [-v]... [-I <varfile>]... [-o <file>] <template_file>
 
     -I <varfile>, --include <varfile>  Variables file/directory to include
+    -v  Output verbosity
+    -o FILE, --output-file FILE  Output file
     """
 
-    return docopt(parse_args.__doc__, argv=argv)
+    return docopt(parse_args.__doc__, argv=argv, version=pkg_version)
+
+
+def _splash():
+    """Print the splash"""
+    splash_title = "{pkg} [{version}] - {url}".format(
+        pkg=pkg_name, version=pkg_version, url=pkg_url)
+    log.to_stdout(splash_title, colorf=log.yellow, bold=True)
+    log.to_stdout('-' * len(splash_title), colorf=log.yellow, bold=True)
+    log.to_stdout(
+        "Please, report issues to {}/issues"
+        .format(pkg_url), colorf=log.yellow, bold=True
+    )
 
 def start(*, options):
-    """the main thing"""
+    """
+    The main thing
+
+    :param options: list of arguments
+    """
+
+    # Log initalization should take place
+    # before anything else
+    quiet_stdout = not bool(options['-v'])
+    log.init(quiet_stdout=quiet_stdout)
+
+    # Show splash
+    _splash()
 
     # measure execution time properly
     start_time = time.time()
 
-    # options passed from the command line
-    var_files = options['--include']
+    ##########################
+    # Get variables themselves
+    ##########################
+    var_files = variables.normalize_search_path(options['--include'])
+    log.msg_debug("Variables search path:")
+    log.msg_debug("**********************")
+    for vf in var_files:
+        log.msg_debug(vf)
+    log.msg_debug("**********************")
     template_file = options['<template_file>']
 
     # Obtain variables from variable files
-    log.msg_debug("tpl_var_files = {}".format(var_files))
-    vars = variables.get_vars(var_files=var_files)
+    vars, files = variables.get_vars(var_files=var_files)
+    vars = renderer.render_dict(vars)
 
+    # Print vars
     log.msg("All variable files have been read.")
     log.msg("**********************************")
     for key, value in vars.items():
-        log.msg("{:10} => '{}'".format(key, value), bold=True)
+        log.msg("{:16} => '{}' [{}]".format(key, value, files[key]), bold=True)
     log.msg("**********************************")
 
-    log.msg("Rendering template ...")
-    renderer.render(vars=vars, template_file=template_file)
+    #######################
+    # Render that template!
+    #######################
+    output_file = options['--output-file']
+    renderer.render_file(
+        vars=vars, template_file=template_file,
+        output_file=output_file
+    )
 
-    dt = time.time() - start_time
-    log.msg("Done! ({:.3f} ms)".format(dt*1000))
+    # Measure execution time
+    log.msg("Done! ({:.3f} ms)".format((time.time() - start_time)*1000))
 
 def _handle_except(e):
     """
@@ -81,8 +124,6 @@ def main(argv=None):
     # Exit code
     exit_code = 0
 
-    # Log initalization should take place before anything else
-    log.init()
 
     # First, we change main() to take an optional 'argv'
     # argument, which allows us to call it from the interactive
@@ -95,7 +136,7 @@ def main(argv=None):
         options = parse_args(argv)
 
         # start the thing!
-        start(options=options)
+        start(options=parse_args(argv))
     except DocoptExit as dexcept:
 
         # Deal with wrong arguments

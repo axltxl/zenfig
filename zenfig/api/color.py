@@ -34,7 +34,7 @@ def normalize_hex(hex_value):
     followed by six lowercase hexadecimal digits (what
     HTML5 terms a “valid lowercase simple color”)
 
-    :hex_value: The hexadecimal color value to normalize.
+    :param hex_value: The hexadecimal color value to normalize.
     :returns: A normalized 6-digit hexadecimal color prepended with a #
     """
 
@@ -46,7 +46,7 @@ def normalize_rgb(rgb_triplet):
     Normalize an integer rgb() triplet so that
     all values are within the range 0..255.
 
-    :rgb_triplet: rgb_triplet (3-tuple of int) – The integer rgb() triplet to normalize.
+    :param rgb_triplet: rgb_triplet (3-tuple of int) – The integer rgb() triplet to normalize.
     :returns: 3-tuple of int
     """
     return webcolors.normalize_triplet(rgb_triplet)
@@ -60,7 +60,7 @@ def hex_to_rgb(hex_value):
     3-tuple of integers suitable for use in
     an rgb() triplet specifying that color.
 
-    :hex_value: The hexadecimal color to convert
+    :param hex_value: The hexadecimal color to convert
     :returns: 3-tuple of int
     """
     return webcolors.hex_to_rgb(hex_value)
@@ -73,7 +73,7 @@ def rgb_to_hex(rgb_triplet):
     suitable for use in an rgb() color triplet,
     to a normalized hexadecimal value for that color.
 
-    :rgb_triplet: rgb_triplet (3-tuple of int) – The integer rgb() triplet to normalize.
+    :param rgb_triplet: rgb_triplet (3-tuple of int) – The integer rgb() triplet to normalize.
     :returns: Hexadecimal color
     """
     return webcolors.rgb_to_hex(hex_color)

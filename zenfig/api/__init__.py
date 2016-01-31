@@ -20,6 +20,7 @@ def api_entry(api_func):
     """
     Common routines for all API entries
 
+    :param api_func: API function to be wrapped up
     :returns: whatever api_func returns, on exception, it returns None
     """
     def _wrapper(*args, **kwargs):

@@ -1,3 +1,7 @@
+zenfig [WIP]
+------------
+Unleash the power of your configuration files
+
 Copyright and Licensing
 =======================
 

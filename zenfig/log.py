@@ -19,7 +19,7 @@ from clint.textui import puts
 _stdout = False
 
 
-def init(*, quiet_stdout=False):
+def init(*, quiet_stdout=True):
     """
     Initiate the log module
 
