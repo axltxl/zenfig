@@ -25,6 +25,7 @@ def render(*, vars, template_file):
 
     :param vars: a dictionary containing all variables to be injected into the template
     :param template_file: path to the template file
+    :param output_file: path to resulting output file
     """
 
     # Make sure we have the absolute path to the template file
@@ -90,6 +91,16 @@ def render(*, vars, template_file):
     # load the template
     tpl = tpl_env.get_template(template_file)
 
-    # render template to stdout
+    ##############################################
+    # Render template to destination (output) file
+    ##############################################
     log.msg("Rendering template ...")
-    print(tpl.render(**vars))
+    rendered_str = tpl.render(**vars)
+    if output_file is None:
+        # Render to stdout
+        print(rendered_str)
+    else:
+        output_file = os.path.abspath(output_file)
+        log.msg("Writing to '{}'".format(output_file), bold=True)
+        with open(output_file, 'w') as of:
+            of.write(rendered_str)

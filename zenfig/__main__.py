@@ -84,8 +84,14 @@ def start(*, options):
         log.msg("{:>16} => '{}'".format(key, value), bold=True)
     log.msg("**********************************")
 
+    #######################
     # Render that template!
-    renderer.render(vars=vars, template_file=template_file)
+    #######################
+    output_file = options['--output-file']
+    renderer.render_file(
+        vars=vars, template_file=template_file,
+        output_file=output_file
+    )
 
     dt = time.time() - start_time
     log.msg("Done! ({:.3f} ms)".format(dt*1000))
