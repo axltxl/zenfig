@@ -13,6 +13,8 @@ Utilities
 import os
 
 def get_xdg_data_home():
+    """Get XDG_DATA_HOME"""
+
     # XDG_DATA_HOME/zenfig/templates is inside
     # the template search path
     xdg_data_home = os.getenv('XDG_DATA_HOME')
