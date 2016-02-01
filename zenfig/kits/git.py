@@ -17,6 +17,7 @@ from git.exc import InvalidGitRepositoryError
 
 from .. import log
 from .. import util
+from ..util import autolog
 
 from . import __kit_isvalid
 
@@ -32,6 +33,7 @@ KIT_CACHE_HOME = "{}/kits".format(util.get_xdg_cache_home())
 KIT_CACHE_MAX_SIZE = 20480
 
 
+@autolog
 def _cache_create():
     """
     Construct kit cache
@@ -63,6 +65,7 @@ def _cache_create():
     # give back the cloned git repository
     return git_repo
 
+@autolog
 def _cache_isvalid():
     """Tell whether the local cache is valid"""
 
@@ -89,6 +92,7 @@ def _cache_isvalid():
     return True
 
 
+@autolog
 def _cache_update():
     """Update kit cache"""
 
@@ -121,27 +125,30 @@ def _cache_update():
             log.msg_warn("Invalid git repo found on cache, rebuilding it ...")
             git_repo = _cache_create()
 
-    # make sure the repo is at the right branch
-    # reset any changes
-    # checkout to GIT_BRANCH
+    # Make sure the repo is at the right branch
+    # reset any changes checkout to GIT_BRANCH
     for head in git_repo.heads:
         if head.name == GIT_BRANCH:
-            log.msg_warn("reseting git repo")
             head.checkout(force=True)
 
+@autolog
 def _get_kit_dir(kit_name):
     return "{}/{}".format(KIT_CACHE_HOME, kit_name)
 
+@autolog
 def init():
     """Initialise kit provider"""
     _cache_update()
 
+@autolog
 def kit_isvalid(kit_name):
     return __kit_isvalid(_get_kit_dir(kit_name))
 
+@autolog
 def get_template_dir(kit_name):
     return "{}/templates".format(_get_kit_dir(kit_name))
 
+@autolog
 def get_var_dir(kit_name):
     return "{}/defaults".format(_get_kit_dir(kit_name))
 

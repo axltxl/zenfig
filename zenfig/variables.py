@@ -17,11 +17,13 @@ import os
 
 from . import log
 from . import util
+from .util import autolog
 
 
 # Sanity check regex for ZF_VAR_PATH
 ZF_VAR_PATH_REGEX = "([^:]+:)*[^:]+$"
 
+@autolog
 def _get_vars_from_env(var_path=None):
     """
     Get variable search paths from environment variable ZF_VAR_PATH (if any)
@@ -36,6 +38,7 @@ def _get_vars_from_env(var_path=None):
         return var_path.split(':')
     return None
 
+@autolog
 def normalize_search_path(*, user_var_files, kit_var_dir=None):
     """
     Normalize variable search path
@@ -87,6 +90,7 @@ def normalize_search_path(*, user_var_files, kit_var_dir=None):
     # Make sure there are no duplicates in this one
     return sorted(set(user_var_files), key=lambda x: user_var_files.index(x))[::-1]
 
+@autolog
 def get_vars(*, var_files):
     """
     Collect all variables taken from all files in var_files

@@ -18,11 +18,14 @@ from . import log
 from . import api
 from . import util
 
+from .util import autolog
+
 
 class InvalidTemplateDirError(BaseException):
     def __init__(self, directory):
         super().__init__("main.j2 not found in {}".format(directory))
 
+@autolog
 def render_dict(vars):
     """
     Render a jinja2-flavored dictionary with itself
@@ -50,6 +53,7 @@ def render_dict(vars):
     # Give back rendered variables
     return vars
 
+@autolog
 def render_file(*, vars, template_file, output_file):
     """
     Render a jinja2 template

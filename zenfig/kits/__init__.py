@@ -13,6 +13,9 @@ Some message
 
 import os
 
+from ..util import autolog
+
+@autolog
 def __kit_isvalid(kit_dir):
     if not os.path.isdir(kit_dir):
         return False

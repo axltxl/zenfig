@@ -12,10 +12,12 @@ A bunch of utilities used by templates
 """
 
 from .. import log
+from ..util import autolog
 
 # all API entries are in here
 _api_map = {}
 
+@autolog
 def api_entry(api_func):
     """
     Common routines for all API entries
@@ -31,9 +33,11 @@ def api_entry(api_func):
             return None
     return _wrapper
 
+@autolog
 def _register(key, value):
     _api_map[key] = value
 
+@autolog
 def get_map():
     """Get the whole API functions map"""
     return _api_map
