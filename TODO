@@ -1,28 +1,3 @@
 Release 0.1:
 
 * Only show resolved variables (-s, --show-vars)
-* Package:
-* -------:
-  A package is basically a generic service configuration
-  schema with both variable and template files targeting
-  a specific service (e.g. i3wm). Packages can be downloaded
-  and rendered using local variables set by the user.
-
-  Packages are basically file system with the following
-  layout:
-
-  * Package root
-  |
-  |__* templates
-  | |__ main.j2
-  | |__ (*.j2)
-  |__* defaults
-     |__ varfile.yml
-     |__ hello.yml
-     |__ (*.yml)
-
-  Once the package has been downloaded by the mean used,
-  it gets rendered using established user variables.
-  Variable search paths are applied as always, defaults
-  set by the package will be take into account the last
-  just after XDG_DATA_HOME/zenfig/vars.
