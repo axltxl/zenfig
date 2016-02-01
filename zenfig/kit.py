@@ -16,7 +16,7 @@ import re
 
 from . import log
 from . import util
-
+from .util import autolog
 from .kits import git, local
 
 ######################
@@ -35,19 +35,21 @@ class InvalidKitError(BaseException):
     def __init__(self, message):
         super().__init__("{} does not have a valid file system.".format(message))
 
+@autolog
 def _set_provider(provider):
     global _kit_provider
     _kit_provider = _kit_providers[provider]
     log.msg_debug("Using kit provider: {}".format(provider))
 
+@autolog
 def _kit_check(kit_func):
     def _wrapper(kit_name):
-        log.msg_debug("Checking kit '{}'".format(kit_name))
         if not _kit_provider.kit_isvalid(kit_name):
             raise InvalidKitError(kit_name)
         return kit_func(kit_name)
     return _wrapper
 
+@autolog
 def init(kit_name, *, provider=None):
     """
     Initialize kit interface
@@ -80,6 +82,7 @@ def init(kit_name, *, provider=None):
     _kit_provider.init()
 
 @_kit_check
+@autolog
 def get_var_dir(kit_name):
     """
     Get variable location from kit_name
@@ -91,6 +94,7 @@ def get_var_dir(kit_name):
     return _kit_provider.get_var_dir(kit_name)
 
 @_kit_check
+@autolog
 def get_template_dir(kit_name):
     """
     Get template location from kit_name
