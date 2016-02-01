@@ -176,7 +176,7 @@ def main(argv=None):
         # Deal with wrong arguments
         print(dexcept)
         exit_code = 1
-    except Exception as e:
+    except BaseException as e:
 
         # ... and if everything else fails
         _handle_except(e)

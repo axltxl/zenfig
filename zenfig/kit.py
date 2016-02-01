@@ -31,12 +31,27 @@ _kit_providers = {
 # kit provider to be used
 _kit_provider = None
 
+class InvalidKitError(BaseException):
+    def __init__(self, message):
+        super().__init__(
+            "'{}' does not have a valid file system" \
+            "Please, read the documentation for more information."
+        )
+
 def _set_provider(provider):
     global _kit_provider
     _kit_provider = _kit_providers[provider]
     log.msg_debug("Using kit provider: {}".format(provider))
 
-def init(kit_name=None, *, provider=None):
+def _kit_check(kit_func):
+    def _wrapper(kit_name):
+        log.msg_debug("Checking kit '{}'".format(kit_name))
+        if not _kit_provider.kit_isvalid(kit_name):
+            raise InvalidKitError(kit_name)
+        kit_func(kit_name)
+    return _wrapper
+
+def init(kit_name, *, provider=None):
     """
     Initialize kit interface
 
@@ -57,8 +72,8 @@ def init(kit_name=None, *, provider=None):
         elif os.path.isdir(os.path.join(os.getcwd(), kit_name)):
             log.msg_debug("Using '{}' as relative directory".format(kit_name))
             _set_provider("local")
-        # test whether kit_name is a git URL
         else:
+        # Asume git URL from main repo
             _set_provider("git")
     else:
         _set_provider("local")
@@ -67,6 +82,7 @@ def init(kit_name=None, *, provider=None):
     # Initiate kit provider
     _kit_provider.init()
 
+@_kit_check
 def get_var_dir(kit_name):
     """
     Get variable location from kit_name
@@ -74,13 +90,10 @@ def get_var_dir(kit_name):
     :param kit_name: Kit name
     :returns:
         Full path to the variables directory of the kit.
-        None is returned on whether kit_name has an invalid location.
     """
+    return _kit_provider.get_var_dir(kit_name)
 
-    if _kit_provider.kit_exists(kit_name):
-        return _kit_provider.get_var_dir(kit_name)
-    return None
-
+@_kit_check
 def get_template_dir(kit_name):
     """
     Get template location from kit_name
@@ -88,9 +101,5 @@ def get_template_dir(kit_name):
     :param kit_name: Kit name
     :returns:
         Full path to the templates directory of the kit.
-        None is returned on whether kit_name has an invalid location.
     """
-
-    if _kit_provider.kit_exists(kit_name):
-        return _kit_provider.get_template_dir(kit_name)
-    return None
+    return _kit_provider.get_template_dir(kit_name)
