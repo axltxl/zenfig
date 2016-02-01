@@ -12,95 +12,85 @@ Kit interface
 """
 
 import os
-
-import git
-from git.exc import InvalidGitRepositoryError
+import re
 
 from . import log
 from . import util
 
-#
-GIT_REPO = "https://github.com/axltxl/zenfig-kits.git"
-GIT_REF  = "refs/heads/dunst" # temporary
+from .kits import git, local
 
-#
-KIT_CACHE_HOME = "{}/kits".format(util.get_xdg_cache_home())
+######################
+# List of kit backends
+# a.k.a. drivers
+######################
+_kit_drivers = {
+    "git": git,
+    "local": local
+}
 
-def _get_kits_root_dir():
-    return "{}/zenfig/kits".format(util.get_xdg_cache_home())
+# kit driver to be used
+_kit_driver = None
 
-def _get_kit_dir(kit_name):
-    return "{}/{}".format(KIT_CACHE_HOME, kit_name)
+def _set_driver(driver):
+    global _kit_driver
+    _kit_driver = _kit_drivers[driver]
+    log.msg_debug("Using kit driver: {}".format(driver))
 
-def _kit_exists(kit_name):
-    return os.path.exists(_get_kit_dir(kit_name))
-
-def get_var_dir(kit):
-    """TODO: Docstring for get_var_dir.
-
-    :kit: TODO
-    :returns: TODO
-
+def init(kit_name=None, *, driver=None):
     """
-    # Give back XDG_CACHE_HOME/zenfig/kits/<kit>/defaults
-    # if existent, otherwise, give None
-    if _kit_exists(kit_name):
-        return "{}/defaults".format(_get_kit_dir(kit_name))
+    Initialize kit interface
+
+    This will deduct what type of kit this is dealing with,
+    it will load the appropiate interface based on kit_name.
+
+    :param kit_name: Name of the kit to be loaded
+    :param driver: Kit driver to be used to load kit_name
+    """
+    # if driver has not been enforced
+    # then, deduct proper driver for kit_name
+    if driver is None:
+        # test whether kit_name is a absolute directory
+        if re.match("^\/", kit_name):
+            log.msg_debug("Using '{}' as absolute directory".format(kit_name))
+            _set_driver("local")
+        # test whether kit_name is a relative directory
+        elif os.path.isdir(os.path.join(os.getcwd(), kit_name)):
+            log.msg_debug("Using '{}' as relative directory".format(kit_name))
+            _set_driver("local")
+        # test whether kit_name is a git URL
+        else:
+            _set_driver("git")
+    else:
+        _set_driver("local")
+        log.msg_debug("Kit driver '{}' has been imposed!".format(driver))
+
+    # Initiate kit driver
+    _kit_driver.init()
+
+def get_var_dir(kit_name):
+    """
+    Get variable location from kit_name
+
+    :param kit_name: Kit name
+    :returns:
+        Full path to the variables directory of the kit.
+        None is returned on whether kit_name has an invalid location.
+    """
+
+    if _kit_driver.kit_exists(kit_name):
+        return _kit_driver.get_var_dir(kit_name)
     return None
 
-def _create_cache():
-    # Clean everything first
-    if os.path.exists(KIT_CACHE_HOME):
-        os.removedirs(KIT_CACHE_HOME)
-
-    #
-    log.msg_debug("Creating kit cache at '{}'".format(KIT_CACHE_HOME))
-    os.makedirs(KIT_CACHE_HOME)
-
-    # clone the thing
-    log.msg_warn("Cloning kits repository")
-    git_repo = git.Repo.clone_from(
-        url=GIT_REPO,
-        to_path=KIT_CACHE_HOME,
-        depth=1
-    )
-    log.msg_warn("Done!")
-
-    return git_repo
-
-def update_cache():
-
-    log.msg("Updating kits cache ...")
-    # check for git repo at XDG_CACHE_HOME/zenfig/kits
-    # if directory not present, clone the repo with depth=1
-    if not os.path.exists(KIT_CACHE_HOME):
-        git_repo = _create_cache()
-    else:
-        try:
-            #TODO: implement this
-            git_repo = git.Repo(
-                KIT_CACHE_HOME,
-                branch_path=GIT_REF
-                )
-            # otherwise, pull from it
-            git_repo.pull(refspec=GIT_REF)
-        except InvalidGitRepositoryError:
-            git_repo = _create_cache()
-
-
 def get_template_dir(kit_name):
-    """TODO: Docstring for get_template_dir.
-
-    :kit_name: TODO
-    :returns: TODO
-
     """
-    pass
+    Get template location from kit_name
 
-    #TODO: implement this!
-    # if kit exists inside git_repo
-    if _kit_exists(kit_name):
-        return "{}/templates".format(_get_kit_dir(kit_name))
-    # return string XDG_CACHE_HOME/zenfig/kits/<kit>
-    # else return None
+    :param kit_name: Kit name
+    :returns:
+        Full path to the templates directory of the kit.
+        None is returned on whether kit_name has an invalid location.
+    """
+
+    if _kit_driver.kit_exists(kit_name):
+        return _kit_driver.get_template_dir(kit_name)
     return None

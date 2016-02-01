@@ -36,7 +36,7 @@ def _get_vars_from_env(var_path=None):
         return var_path.split(':')
     return None
 
-def normalize_search_path(*, user_var_files, package_var_files=None):
+def normalize_search_path(*, user_var_files, kit_var_dir=None):
     """
     Normalize variable search path
 
@@ -81,8 +81,8 @@ def normalize_search_path(*, user_var_files, package_var_files=None):
     # (if specified) in
     # XDG_CACHE_HOME/zenfig/<package>/defaults
     ########################################
-    if package_var_files is not None:
-        user_var_files.extend(package_var_files)
+    if kit_var_dir is not None:
+        user_var_files.append(kit_var_dir)
 
     # Make sure there are no duplicates in this one
     return sorted(set(user_var_files), key=lambda x: user_var_files.index(x))[::-1]

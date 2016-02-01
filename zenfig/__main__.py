@@ -67,28 +67,40 @@ def start(*, options):
     # measure execution time properly
     start_time = time.time()
 
-    #
-    #TODO: comment this!
+    # Template file taken from args
     template_file = options['<template_file>']
-    kit_name = options['--kit']
-    kit_var_files = None
+
+    # Variable locations taken from args
     user_var_files = options['--include']
 
-    #
-    #TODO: implement this!
-    if template_file is None:
-        # update kits cache (git repo)
-        kit.update_cache()
 
-        #
-        kit_var_files = kit.get_var_dir(kit_name)
+    ###################################
+    # Initialize kit interface:
+    # This will deduct what type of kit
+    # this is dealing with, it will load
+    # the appropiate interface based on
+    # kit_name.
+    ###################################
+    kit_name = options['--kit']
+    kit_var_dir = None
+
+    if template_file is None:
+
+        # Initialise kit interface
+        kit.init(kit_name)
+
+        # Get variables location for this kit
+        kit_var_dir = kit.get_var_dir(kit_name)
+
+        # get template main dir from kit
+        template_file = kit.get_template_dir(kit_name)
 
     ##########################
     # Get variable search path
     ##########################
     user_var_files = variables.normalize_search_path(
         user_var_files=user_var_files,
-        kit_var_files=kit_var_files
+        kit_var_dir=kit_var_dir
     )
     log.msg_debug("Variables search path:")
     log.msg_debug("**********************")
@@ -96,16 +108,9 @@ def start(*, options):
         log.msg_debug(vf)
     log.msg_debug("**********************")
 
-    #
-    #TODO: implement this!
-    if template_file is None:
-        # get template main dir from kit
-        template_file = kit.get_template_dir(kit_name)
-
     # Obtain variables from variable files
     vars, files = variables.get_vars(
-        user_var_files=user_var_files,
-        kit_var_files=kit_var_files
+        var_files=user_var_files,
     )
     vars = renderer.render_dict(vars)
 
@@ -139,7 +144,7 @@ def _handle_except(e):
     log.msg_err("Unhandled {e} at {file}:{line}: '{msg}'" .format(
         e=exc_type.__name__, file=fname,
         line=exc_tb.tb_lineno, msg=e))
-    log.msg_err(traceback.format_exc())
+    log.msg_debug(traceback.format_exc())
     log.msg_err("An error has occurred!. "
                 "For more details, review the logs.")
     return 1
