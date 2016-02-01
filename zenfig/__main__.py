@@ -24,12 +24,12 @@ from zenfig import log
 from zenfig import variables
 from zenfig import PKG_URL as pkg_url
 from zenfig import __name__ as pkg_name, __version__ as pkg_version
-from zenfig import package
+from zenfig import kit
 
 def parse_args(argv):
-    """Usage: zenfig [-v]... [-I <varfile>]... [-o <file>] (<template_file> | -p <package>)
+    """Usage: zenfig [-v]... [-I <varfile>]... [-o <file>] (<template_file> | -k <kit>)
 
-    -p, --package <package>  Render package (needs better explanation)
+    -k, --kit <kit>  Render kit (needs better explanation)
     -I <varfile>, --include <varfile>  Variables file/directory to include
     -v  Output verbosity
     -o FILE, --output-file FILE  Output file
@@ -70,25 +70,25 @@ def start(*, options):
     #
     #TODO: comment this!
     template_file = options['<template_file>']
-    package_name = options['--package']
-    package_var_files = None
+    kit_name = options['--kit']
+    kit_var_files = None
     user_var_files = options['--include']
 
     #
     #TODO: implement this!
     if template_file is None:
-        # update packages cache (git repo)
-        package.update_cache()
+        # update kits cache (git repo)
+        kit.update_cache()
 
         #
-        package_var_files = package.get_var_dir(package_name)
+        kit_var_files = kit.get_var_dir(kit_name)
 
     ##########################
     # Get variable search path
     ##########################
     user_var_files = variables.normalize_search_path(
         user_var_files=user_var_files,
-        package_var_files=package_var_files
+        kit_var_files=kit_var_files
     )
     log.msg_debug("Variables search path:")
     log.msg_debug("**********************")
@@ -99,13 +99,13 @@ def start(*, options):
     #
     #TODO: implement this!
     if template_file is None:
-        # get template main dir from package
-        template_file = package.get_template_dir(package_name)
+        # get template main dir from kit
+        template_file = kit.get_template_dir(kit_name)
 
     # Obtain variables from variable files
     vars, files = variables.get_vars(
         user_var_files=user_var_files,
-        package_var_files=package_var_files
+        kit_var_files=kit_var_files
     )
     vars = renderer.render_dict(vars)
 
