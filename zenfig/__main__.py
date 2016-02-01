@@ -24,6 +24,7 @@ from zenfig import log
 from zenfig import variables
 from zenfig import PKG_URL as pkg_url
 from zenfig import __name__ as pkg_name, __version__ as pkg_version
+from zenfig import package
 
 def parse_args(argv):
     """Usage: zenfig [-v]... [-I <varfile>]... [-o <file>] (<template_file> | -p <package>)
@@ -66,28 +67,12 @@ def start(*, options):
     # measure execution time properly
     start_time = time.time()
 
-    ##########################
-    # Get variables themselves
-    ##########################
-    var_files = variables.normalize_search_path(options['--include'])
-    log.msg_debug("Variables search path:")
-    log.msg_debug("**********************")
-    for vf in var_files:
-        log.msg_debug(vf)
-    log.msg_debug("**********************")
-
     #
     #TODO: comment this!
     template_file = options['<template_file>']
-    package = options['--package']
+    package_name = options['--package']
     package_var_files = None
-
-    # Obtain variables from variable files
-    vars, files = variables.get_vars(
-        user_var_files=user_var_files,
-        package_var_files=package_var_files
-    )
-    vars = renderer.render_dict(vars)
+    user_var_files = options['--include']
 
     #
     #TODO: implement this!
@@ -95,8 +80,34 @@ def start(*, options):
         # update packages cache (git repo)
         package.update_cache()
 
+        #
+        package_var_files = package.get_var_dir(package_name)
+
+    ##########################
+    # Get variable search path
+    ##########################
+    user_var_files = variables.normalize_search_path(
+        user_var_files=user_var_files,
+        package_var_files=package_var_files
+    )
+    log.msg_debug("Variables search path:")
+    log.msg_debug("**********************")
+    for vf in user_var_files:
+        log.msg_debug(vf)
+    log.msg_debug("**********************")
+
+    #
+    #TODO: implement this!
+    if template_file is None:
         # get template main dir from package
-        template_file = package.get_template_dir(package)
+        template_file = package.get_template_dir(package_name)
+
+    # Obtain variables from variable files
+    vars, files = variables.get_vars(
+        user_var_files=user_var_files,
+        package_var_files=package_var_files
+    )
+    vars = renderer.render_dict(vars)
 
     # Print vars
     log.msg("All variable files have been read.")
