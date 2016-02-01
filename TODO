@@ -1,3 +1,7 @@
 Release 0.1:
 
 * Only show resolved variables (-s, --show-vars)
+* Injected default variables:
+    env_PATH + others
+    base16 colors as color_baseDD with default palette from Chris Kempson
+    browser: which should be equal to BROWSER or /usr/bin/firefox if the former does not exist
