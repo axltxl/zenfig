@@ -76,6 +76,13 @@ def normalize_search_path(var_files):
     xdg_variables_dir = "{}/vars".format(util.get_xdg_data_home())
     var_files.append(xdg_variables_dir)
 
+    ########################################
+    # 4 => Default variables set by the package
+    # (if specified) in
+    # XDG_CACHE_HOME/zenfig/<package>/defaults
+    ########################################
+    #TODO: implement this!
+
     # Make sure there are no duplicates in this one
     return sorted(set(var_files), key=lambda x: var_files.index(x))[::-1]
 
