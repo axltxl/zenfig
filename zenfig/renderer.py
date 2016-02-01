@@ -18,7 +18,14 @@ from . import log
 from . import api
 from . import util
 
+from .util import autolog
 
+
+class InvalidTemplateDirError(BaseException):
+    def __init__(self, directory):
+        super().__init__("main.j2 not found in {}".format(directory))
+
+@autolog
 def render_dict(vars):
     """
     Render a jinja2-flavored dictionary with itself
@@ -46,6 +53,7 @@ def render_dict(vars):
     # Give back rendered variables
     return vars
 
+@autolog
 def render_file(*, vars, template_file, output_file):
     """
     Render a jinja2 template
@@ -68,6 +76,11 @@ def render_file(*, vars, template_file, output_file):
         template_file = "{}/main.j2".format(template_file)
         log.msg_warn("You have specified a template directory")
         log.msg_warn("I'm gonna look for {}".format(template_file))
+
+        if os.path.isfile(template_file):
+            log.msg_warn("{} found!".format(template_file))
+        else:
+            raise InvalidTemplateDirError(os.path.dirname(template_file))
 
     ####################################################
     # zenfig will look for templates on this directories

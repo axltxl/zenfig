@@ -17,11 +17,13 @@ import os
 
 from . import log
 from . import util
+from .util import autolog
 
 
 # Sanity check regex for ZF_VAR_PATH
 ZF_VAR_PATH_REGEX = "([^:]+:)*[^:]+$"
 
+@autolog
 def _get_vars_from_env(var_path=None):
     """
     Get variable search paths from environment variable ZF_VAR_PATH (if any)
@@ -36,11 +38,12 @@ def _get_vars_from_env(var_path=None):
         return var_path.split(':')
     return None
 
-def normalize_search_path(var_files):
+@autolog
+def normalize_search_path(*, user_var_files, kit_var_dir=None):
     """
     Normalize variable search path
 
-    :param var_files: Raw list of variable locations
+    :param user_var_files: Raw list of variable locations set by the user
     :returns: A normalized list of variable locations/files, ordered by precedence
     """
 
@@ -54,8 +57,8 @@ def normalize_search_path(var_files):
     # Make sure we have absolute paths to
     # all variable files and/or directories
     #####################################
-    for i in range(len(var_files)):
-        var_files[i] = os.path.abspath(var_files[i])
+    for i in range(len(user_var_files)):
+        user_var_files[i] = os.path.abspath(user_var_files[i])
 
     ################################
     # 2 => Variables set in ZF_VAR_PATH
@@ -64,9 +67,9 @@ def normalize_search_path(var_files):
     # be set, then it will be taken into
     # account for variables search path
     ################################
-    vars_env = _get_vars_from_env()
-    if vars_env is not None:
-        var_files.extend(vars_env)
+    env_vars = _get_vars_from_env()
+    if env_vars is not None:
+        user_var_files.extend(env_vars)
 
     ########################################
     # 3 => Variables set in default vars dir
@@ -74,11 +77,20 @@ def normalize_search_path(var_files):
     # search path
     ########################################
     xdg_variables_dir = "{}/vars".format(util.get_xdg_data_home())
-    var_files.append(xdg_variables_dir)
+    user_var_files.append(xdg_variables_dir)
+
+    ########################################
+    # 4 => Default variables set by the package
+    # (if specified) in
+    # XDG_CACHE_HOME/zenfig/<package>/defaults
+    ########################################
+    if kit_var_dir is not None:
+        user_var_files.append(kit_var_dir)
 
     # Make sure there are no duplicates in this one
-    return sorted(set(var_files), key=lambda x: var_files.index(x))[::-1]
+    return sorted(set(user_var_files), key=lambda x: user_var_files.index(x))[::-1]
 
+@autolog
 def get_vars(*, var_files):
     """
     Collect all variables taken from all files in var_files
