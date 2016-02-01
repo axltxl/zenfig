@@ -77,7 +77,7 @@ def start(*, options):
     log.msg_debug("**********************")
 
     #
-    #TODO: implement this!
+    #TODO: comment this!
     template_file = options['<template_file>']
     package = options['--package']
     package_var_files = None
@@ -92,6 +92,9 @@ def start(*, options):
     #
     #TODO: implement this!
     if template_file is None:
+        # update packages cache (git repo)
+        package.update_cache()
+
         # get template main dir from package
         template_file = package.get_template_dir(package)
 

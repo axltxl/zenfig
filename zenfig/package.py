@@ -11,6 +11,9 @@ Package interface
 
 """
 
+from . import log
+from . import util
+
 #
 GIT_REPO = "https://github.com/axltxl/zenfig-packages.git"
 
@@ -28,7 +31,7 @@ def get_var_dir(package):
     # if existent, otherwise, give None
     pass
 
-def update_cache(package):
+def update_cache():
     #TODO: implement this
     # check for git repo at XDG_CACHE_HOME/zenfig/packages
     # if directory not present, clone the repo with depth=1
