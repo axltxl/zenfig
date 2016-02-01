@@ -21,22 +21,22 @@ from .kits import git, local
 
 ######################
 # List of kit backends
-# a.k.a. drivers
+# a.k.a. providers
 ######################
-_kit_drivers = {
+_kit_providers = {
     "git": git,
     "local": local
 }
 
-# kit driver to be used
-_kit_driver = None
+# kit provider to be used
+_kit_provider = None
 
-def _set_driver(driver):
-    global _kit_driver
-    _kit_driver = _kit_drivers[driver]
-    log.msg_debug("Using kit driver: {}".format(driver))
+def _set_provider(provider):
+    global _kit_provider
+    _kit_provider = _kit_providers[provider]
+    log.msg_debug("Using kit provider: {}".format(provider))
 
-def init(kit_name=None, *, driver=None):
+def init(kit_name=None, *, provider=None):
     """
     Initialize kit interface
 
@@ -44,28 +44,28 @@ def init(kit_name=None, *, driver=None):
     it will load the appropiate interface based on kit_name.
 
     :param kit_name: Name of the kit to be loaded
-    :param driver: Kit driver to be used to load kit_name
+    :param provider: Kit provider to be used to load kit_name
     """
-    # if driver has not been enforced
-    # then, deduct proper driver for kit_name
-    if driver is None:
+    # if provider has not been enforced
+    # then, deduct proper provider for kit_name
+    if provider is None:
         # test whether kit_name is a absolute directory
         if re.match("^\/", kit_name):
             log.msg_debug("Using '{}' as absolute directory".format(kit_name))
-            _set_driver("local")
+            _set_provider("local")
         # test whether kit_name is a relative directory
         elif os.path.isdir(os.path.join(os.getcwd(), kit_name)):
             log.msg_debug("Using '{}' as relative directory".format(kit_name))
-            _set_driver("local")
+            _set_provider("local")
         # test whether kit_name is a git URL
         else:
-            _set_driver("git")
+            _set_provider("git")
     else:
-        _set_driver("local")
-        log.msg_debug("Kit driver '{}' has been imposed!".format(driver))
+        _set_provider("local")
+        log.msg_debug("Kit provider '{}' has been imposed!".format(provider))
 
-    # Initiate kit driver
-    _kit_driver.init()
+    # Initiate kit provider
+    _kit_provider.init()
 
 def get_var_dir(kit_name):
     """
@@ -77,8 +77,8 @@ def get_var_dir(kit_name):
         None is returned on whether kit_name has an invalid location.
     """
 
-    if _kit_driver.kit_exists(kit_name):
-        return _kit_driver.get_var_dir(kit_name)
+    if _kit_provider.kit_exists(kit_name):
+        return _kit_provider.get_var_dir(kit_name)
     return None
 
 def get_template_dir(kit_name):
@@ -91,6 +91,6 @@ def get_template_dir(kit_name):
         None is returned on whether kit_name has an invalid location.
     """
 
-    if _kit_driver.kit_exists(kit_name):
-        return _kit_driver.get_template_dir(kit_name)
+    if _kit_provider.kit_exists(kit_name):
+        return _kit_provider.get_template_dir(kit_name)
     return None
