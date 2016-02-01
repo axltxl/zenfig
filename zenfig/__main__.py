@@ -29,7 +29,7 @@ from zenfig import package
 def parse_args(argv):
     """Usage: zenfig [-v]... [-I <varfile>]... [-o <file>] (<template_file> | -p <package>)
 
-    -p,  --package <package>
+    -p, --package <package>  Render package (needs better explanation)
     -I <varfile>, --include <varfile>  Variables file/directory to include
     -v  Output verbosity
     -o FILE, --output-file FILE  Output file
