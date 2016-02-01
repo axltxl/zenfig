@@ -95,6 +95,9 @@ def start(*, options):
         # get template main dir from kit
         template_file = kit.get_template_dir(kit_name)
 
+        # mark the thing
+        log.msg_warn("Found kit: {}".format(kit_name))
+
     ##########################
     # Get variable search path
     ##########################
@@ -109,9 +112,11 @@ def start(*, options):
     log.msg_debug("**********************")
 
     # Obtain variables from variable files
-    vars, files = variables.get_vars(
-        var_files=user_var_files,
-    )
+    vars, files = variables.get_vars(var_files=user_var_files)
+
+    # variables whose values are strings may
+    # have jinja2 logic within them as well
+    # so we render those values through jinja
     vars = renderer.render_dict(vars)
 
     # Print vars
@@ -158,7 +163,6 @@ def main(argv=None):
     # Exit code
     exit_code = 0
 
-
     # First, we change main() to take an optional 'argv'
     # argument, which allows us to call it from the interactive
     # Python prompt
@@ -166,18 +170,13 @@ def main(argv=None):
         argv = sys.argv[1:]
 
     try:
-        # Bootstrap
-        options = parse_args(argv)
-
         # start the thing!
         start(options=parse_args(argv))
     except DocoptExit as dexcept:
-
         # Deal with wrong arguments
         print(dexcept)
         exit_code = 1
     except BaseException as e:
-
         # ... and if everything else fails
         _handle_except(e)
         exit_code = 1

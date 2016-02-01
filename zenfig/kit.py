@@ -33,10 +33,7 @@ _kit_provider = None
 
 class InvalidKitError(BaseException):
     def __init__(self, message):
-        super().__init__(
-            "'{}' does not have a valid file system" \
-            "Please, read the documentation for more information."
-        )
+        super().__init__("{} does not have a valid file system.".format(message))
 
 def _set_provider(provider):
     global _kit_provider
@@ -48,7 +45,7 @@ def _kit_check(kit_func):
         log.msg_debug("Checking kit '{}'".format(kit_name))
         if not _kit_provider.kit_isvalid(kit_name):
             raise InvalidKitError(kit_name)
-        kit_func(kit_name)
+        return kit_func(kit_name)
     return _wrapper
 
 def init(kit_name, *, provider=None):
