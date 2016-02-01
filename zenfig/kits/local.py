@@ -15,6 +15,8 @@ import os
 from .. import log
 from .. import util
 
+from . import __kit_isvalid
+
 def _get_kit_dir(kit_name):
     return os.path.abspath(kit_name)
 
@@ -28,14 +30,7 @@ def kit_isvalid(kit_name):
 
     :param kit_name: Kit to be validated
     """
-    kit_dir = _get_kit_dir(kit_name)
-    if not os.path.isdir(kit_dir):
-        return False
-    if not os.path.isdir("{}/templates".format(kit_dir)):
-        return False
-    if not os.path.isdir("{}/defaults".format(kit_dir)):
-        return False
-    return True
+    return __kit_isvalid(_get_kit_dir(kit_name))
 
 ########################
 # kit interface routines

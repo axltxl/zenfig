@@ -10,3 +10,14 @@ Some message
 :license: MIT, see LICENSE for more details.
 
 """
+
+import os
+
+def __kit_isvalid(kit_dir):
+    if not os.path.isdir(kit_dir):
+        return False
+    if not os.path.isdir("{}/templates".format(kit_dir)):
+        return False
+    if not os.path.isdir("{}/defaults".format(kit_dir)):
+        return False
+    return True
