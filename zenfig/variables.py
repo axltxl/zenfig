@@ -301,7 +301,7 @@ def list_vars(*, vars, locations):
 
     log.msg("All variable files have been read.")
     log.msg("**********************************")
-    for key, value in vars.items():
+    for key, value in sorted(vars.items()):
         location = locations[key]
         if location is None:
             location = "builtin"
