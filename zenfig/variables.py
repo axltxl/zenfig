@@ -163,7 +163,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     # set locations
     # TODO: optimize this!
     for user_var in user_vars.keys():
-        user_var_locations[user_var] = "default"
+        user_var_locations[user_var] = None
 
     ##########################
     # Get variable search path
@@ -174,8 +174,8 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     )
     log.msg_debug("Variables search path:")
     log.msg_debug("**********************")
-    for vf in user_var_files:
-        log.msg_debug(vf)
+    for user_var_file in user_var_files:
+        log.msg_debug(user_var_file)
     log.msg_debug("**********************")
 
     ########################################
@@ -199,7 +199,11 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     # Variables whose values are strings may
     # have jinja2 logic within them as well
     # so we render those values through jinja
+    # so, we merge defaults and builtins with
+    # user-set values to get the final picture
     user_vars.update(renderer.render_dict(user_vars))
+
+    # and we consolidate their locations (should they come from actual files)
     user_var_locations.update(locations)
 
     # Print vars
