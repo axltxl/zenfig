@@ -13,6 +13,7 @@ Template renderer
 
 import os
 import jinja2
+import re
 
 from . import log
 from . import api
@@ -53,7 +54,20 @@ def render_dict(vars):
     #############################################
     for tpl_name, tpl_value in vars.items():
         if isinstance(tpl_value, str):
-            vars[tpl_name] = tpl_env.get_template(tpl_name).render(**vars)
+            ################################################################
+            # FIXME: if a var references another var whose value
+            # is also a jinja string, its result becomes quite unpredictable
+            # because depending on what jinja2.Environment.render() does,
+            # some variables from which other ones depend on are rendered
+            # before being used by others, but sometimes only the raw
+            # template string gets assigned to this vars, a workaround has
+            # been to render string variables until they stop being raw string
+            # templates. This works just fine, but, there's gotta be something
+            # better to address this.
+            # TODO: implement an unit test for this function
+            ################################################################
+            while re.match("^{{.*}}$", vars[tpl_name]):
+                vars[tpl_name] = tpl_env.get_template(tpl_name).render(**vars)
 
     # Give back rendered variables
     return vars
