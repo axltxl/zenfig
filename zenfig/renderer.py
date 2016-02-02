@@ -40,10 +40,10 @@ def render_dict(vars):
     ###########################
     tpl_env = jinja2.Environment(loader=jinja2.DictLoader(vars))
 
-    ############################
-    # register all API functions
-    ############################
-    _register_api_entries(tpl_env)
+    ##################################
+    # Register all globals and filters
+    ##################################
+    _register_api(tpl_env)
 
     #############################################
     # Strings found in this dict will be rendered
@@ -72,12 +72,25 @@ def render_dict(vars):
     # Give back rendered variables
     return vars
 
-@autolog
-def _register_api_entries(tpl_env):
-    """Register all API functions"""
+def _register_api(tpl_env):
+    """Register custom globals and filters"""
 
-    for api_entry, api_func in api.get_map().items():
-        tpl_env.globals[api_entry] = api_func
+    _register_api_globals(tpl_env)
+    _register_api_filters(tpl_env)
+
+@autolog
+def _register_api_globals(tpl_env):
+    """Register all globals"""
+
+    for api_global_name, api_global_func in api.get_globals().items():
+        tpl_env.globals[api_global_name] = api_global_func
+
+@autolog
+def _register_api_filters(tpl_env):
+    """Register all filters"""
+
+    for api_filter_name, api_filter_func in api.get_filters().items():
+        tpl_env.filters[api_filter_name] = api_filter_func
 
 @autolog
 def render_file(*, vars, template_file, output_file):
@@ -152,7 +165,7 @@ def render_file(*, vars, template_file, output_file):
     ############################
     # register all API functions
     ############################
-    _register_api_entries(tpl_env)
+    _register_api(tpl_env)
 
     # load the template
     tpl = tpl_env.get_template(template_file)
