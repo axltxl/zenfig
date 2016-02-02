@@ -178,17 +178,6 @@ def get_user_vars(*, user_var_files, kit_var_dir):
         log.msg_debug(vf)
     log.msg_debug("**********************")
 
-    ######################################################
-    # Obtain variables from variable files set by the user
-    ######################################################
-    vars, locations = _get_vars(var_files=user_var_files)
-
-    # Variables whose values are strings may
-    # have jinja2 logic within them as well
-    # so we render those values through jinja
-    user_vars.update(renderer.render_dict(vars))
-    user_var_locations.update(locations)
-
     ########################################
     # Set builtin variables
     # They are set at this point so they are
@@ -200,6 +189,18 @@ def get_user_vars(*, user_var_files, kit_var_dir):
         builtin_var_locations[builtin_var] = "builtin"
     user_vars.update(builtin_vars)
     user_var_locations.update(builtin_var_locations)
+
+    ######################################################
+    # Obtain variables from variable files set by the user
+    ######################################################
+    vars, locations = _get_vars(var_files=user_var_files)
+    user_vars.update(vars)
+
+    # Variables whose values are strings may
+    # have jinja2 logic within them as well
+    # so we render those values through jinja
+    user_vars.update(renderer.render_dict(user_vars))
+    user_var_locations.update(locations)
 
     # Print vars
     log.msg("All variable files have been read.")
