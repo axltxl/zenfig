@@ -203,16 +203,32 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     user_var_locations.update(locations)
 
     # Print vars
+    list_vars(vars=user_vars, locations=user_var_locations)
+
+    # Give variables already!
+    return user_vars
+
+@autolog
+def list_vars(*, vars, locations):
+    """Print all vars given"""
+
     log.msg("All variable files have been read.")
     log.msg("**********************************")
-    for key, value in user_vars.items():
-        log.msg("{:16} => '{}' [{}]".format(
-            key, value, user_var_locations[key]), bold=True
-        )
+    for key, value in vars.items():
+        location = locations[key]
+        if location is None:
+            location = "builtin"
+        if isinstance(value, list):
+            log.msg("{:24} [list] [{}]".format(key, location))
+            for subvalue in value:
+                log.msg("    => {}".format(subvalue), bold=True)
+        elif isinstance(value, dict):
+            log.msg("{:24} [list] [{}]".format(key, location))
+            for k, v in value:
+                log.msg("  {:24}  => {}".format(k, v))
+        else:
+            log.msg("{:24} = '{}' [{}]".format(key, value, location))
     log.msg("**********************************")
-
-    #
-    return user_vars
 
 @autolog
 def _get_vars(*, var_files):
