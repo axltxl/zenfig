@@ -269,7 +269,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     builtin_vars = _get_builtin_vars()
     builtin_var_locations = {}
     for builtin_var in builtin_vars.keys():
-        builtin_var_locations[builtin_var] = "built-in"
+        builtin_var_locations[builtin_var] = None
     user_vars.update(builtin_vars)
     user_var_locations.update(builtin_var_locations)
 
@@ -304,7 +304,7 @@ def list_vars(*, vars, locations):
     for key, value in sorted(vars.items()):
         location = locations[key]
         if location is None:
-            location = "builtin"
+            location = "built-in"
         if isinstance(value, list):
             log.msg("{:24} [list] [{}]".format(key, location))
             for subvalue in value:
