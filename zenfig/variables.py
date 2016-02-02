@@ -299,7 +299,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
 def list_vars(*, vars, locations):
     """Print all vars given"""
 
-    log.msg("All variable files have been read.")
+    log.msg("{} variable(s) captured".format(len(vars)))
     log.msg("**********************************")
     for key, value in sorted(vars.items()):
         location = locations[key]
