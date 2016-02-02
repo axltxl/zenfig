@@ -113,6 +113,11 @@ def _get_default_vars():
         "font_antialiasing": True,
         "font_hinting": True,
 
+        # Terminal settings
+        "term": os.getenv("TERM"),
+        "term_font": "Mono",
+        "term_font_size": 10,
+
         # base16 colors
         # (default palette)
         "color_base00": "181818",
