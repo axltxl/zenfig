@@ -37,7 +37,12 @@ def render_dict(vars):
     ###########################
     # Load template environment
     ###########################
-    tpl_env = jinja2.Environment(loader=jinja2.DictLoader(vars),)
+    tpl_env = jinja2.Environment(loader=jinja2.DictLoader(vars))
+
+    ############################
+    # register all API functions
+    ############################
+    _register_api_entries(tpl_env)
 
     #############################################
     # Strings found in this dict will be rendered
@@ -52,6 +57,13 @@ def render_dict(vars):
 
     # Give back rendered variables
     return vars
+
+@autolog
+def _register_api_entries(tpl_env):
+    """Register all API functions"""
+
+    for api_entry, api_func in api.get_map().items():
+        tpl_env.globals[api_entry] = api_func
 
 @autolog
 def render_file(*, vars, template_file, output_file):
@@ -126,8 +138,7 @@ def render_file(*, vars, template_file, output_file):
     ############################
     # register all API functions
     ############################
-    for api_entry, api_func in api.get_map().items():
-        tpl_env.globals[api_entry] = api_func
+    _register_api_entries(tpl_env)
 
     # load the template
     tpl = tpl_env.get_template(template_file)
