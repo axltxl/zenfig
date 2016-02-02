@@ -15,7 +15,8 @@ from .. import log
 from ..util import autolog
 
 # all API entries are in here
-_api_map = {}
+_api_globals = {}
+_api_filters = {}
 
 @autolog
 def api_entry(api_func):
@@ -34,13 +35,22 @@ def api_entry(api_func):
     return _wrapper
 
 @autolog
-def _register(key, value):
-    _api_map[key] = value
+def _register_global(name, func):
+    _api_globals[name] = func
 
 @autolog
-def get_map():
-    """Get the whole API functions map"""
-    return _api_map
+def _register_filter(name, func):
+    _api_filters[name] = func
+
+@autolog
+def get_globals():
+    """Get all globals"""
+    return _api_globals
+
+@autolog
+def get_filters():
+    """Get all filters"""
+    return _api_filters
 
 ####################################################
 # Bring all API functions so they are all registered
