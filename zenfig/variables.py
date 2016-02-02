@@ -344,26 +344,34 @@ def _get_vars(*, var_files):
         # Normalize full path to file
         var_file = os.path.abspath(var_file)
 
+        ###############################################################
         # The entry is in fact a file, thus, to load it directly I must
         # Only files with .yaml and .yml will be taken into account
+        ###############################################################
+        # The entry is in fact a file, thus, to load it directly I must
         if os.path.isfile(var_file) and \
         re.match("/.*\.yaml$", var_file) or re.match("/.*\.yml$", var_file):
             with open(var_file, 'r') as f:
-                log.msg_debug("Found variable file: {}".format(var_file))
-                log.msg("Reading variables from '{}'".format(var_file))
-
                 # Update variables with those found
                 # on this file
-                vars = yaml.load(f)
-                tpl_vars.update(vars)
+                try:
+                    vars = yaml.load(f)
+                    tpl_vars.update(vars)
+                    # And update locations in which these
+                    # variables were found
+                    for var in vars.keys():
+                        tpl_files[var] = var_file
 
-                # And update locations in which these
-                # variables were found
-                for var in vars.keys():
-                    tpl_files[var] = var_file
+                    # Log the count
+                    log.msg_debug("Found {} variable(s) in {}".format(
+                        len(vars), var_file)
+                    )
+                except yaml.YAMLError as exc:
+                    log.msg_err("Error loading variable file: {}".format(
+                        var_file)
+                    )
+                    log.msg_err("{}: file discarded".format(var_file))
 
-                # Log the count
-                log.msg_debug("Found {} variable(s) in {}".format(len(vars), var_file))
 
         # The entry is a directory
         elif os.path.isdir(var_file):
