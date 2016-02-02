@@ -1,6 +1,7 @@
 Release 0.1.0
 -------------
 * Kits ecosystem:
+  ---------------
   A kit is basically a generic service configuration
   schema with both variable and template files targeting
   a specific service (e.g. i3wm). Kits can be downloaded
@@ -24,6 +25,13 @@ Release 0.1.0
   Variable search paths are applied as always, defaults
   set by the kit will be take into account the last
   just after XDG_DATA_HOME/zenfig/vars.
+
+* Variables ecosystem:
+  --------------------
+  A bunch of variables are set by default by zenfig
+  at startup time, these are default and built-in variables,
+  the former are mutable and the latters are not, for the
+  moment, they cover basics and will grow along new releases.
 
 Release 0.0.1
 -------------
