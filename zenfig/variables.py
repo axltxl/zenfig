@@ -362,6 +362,9 @@ def _get_vars(*, var_files):
                 for var in vars.keys():
                     tpl_files[var] = var_file
 
+                # Log the count
+                log.msg_debug("Found {} variable(s) in {}".format(len(vars), var_file))
+
         # The entry is a directory
         elif os.path.isdir(var_file):
 
