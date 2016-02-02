@@ -98,41 +98,22 @@ def start(*, options):
         # mark the thing
         log.msg_warn("Found kit: {}".format(kit_name))
 
-    ##########################
-    # Get variable search path
-    ##########################
-    user_var_files = variables.normalize_search_path(
+    ####################
+    # Get user variables
+    ####################
+    user_vars = variables.get_user_vars(
         user_var_files=user_var_files,
         kit_var_dir=kit_var_dir
     )
-    log.msg_debug("Variables search path:")
-    log.msg_debug("**********************")
-    for vf in user_var_files:
-        log.msg_debug(vf)
-    log.msg_debug("**********************")
-
-    # Obtain variables from variable files
-    vars, files = variables.get_vars(var_files=user_var_files)
-
-    # variables whose values are strings may
-    # have jinja2 logic within them as well
-    # so we render those values through jinja
-    vars = renderer.render_dict(vars)
-
-    # Print vars
-    log.msg("All variable files have been read.")
-    log.msg("**********************************")
-    for key, value in vars.items():
-        log.msg("{:16} => '{}' [{}]".format(key, value, files[key]), bold=True)
-    log.msg("**********************************")
 
     #######################
     # Render that template!
     #######################
     output_file = options['--output-file']
     renderer.render_file(
-        vars=vars, template_file=template_file,
-        output_file=output_file
+        vars=user_vars,
+        template_file=template_file,
+        output_file=output_file,
     )
 
     # Measure execution time
