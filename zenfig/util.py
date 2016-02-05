@@ -12,27 +12,51 @@ Utilities
 """
 import os
 import inspect
-from time import time
-from . import log
 
+from functools import wraps
+from time import time
+
+from . import log
 from . import __name__ as pkg_name
 
-# Based on: http://stackoverflow.com/questions/10973362/python-logging-function-name-file-name-line-number-using-a-single-file
-def autolog(log_func):
-    "Automatically log the current function details."
-    def _log_wrapper(*args, **kwargs):
-        # get the function name
-        func = log_func.__name__
+def memoize(func):
+    """
+    A simple memcache decorator
+    """
+    # Cache as dict, all entries go in here
+    cache = {}
 
+    # Wrapper function
+    @wraps(func)
+    def _wrapper(key, *args, **kwargs):
+        if isinstance(key, str):
+            if key in cache:
+                return cache[key]
+            cache[key] = func(key, *args, **kwargs)
+            return cache[key]
+        return func(key, *args, **kwargs)
+
+    # give that wrapper
+    return _wrapper
+
+# Based on: http://stackoverflow.com/questions/10973362/python-logging-function-name-file-name-line-number-using-a-single-file
+def autolog(func):
+    """
+    Decorator for automatically log the current function details.
+    """
+
+    # Wrapper function
+    @wraps(func)
+    def _log_wrapper(*args, **kwargs):
         # measure its execution time
         start_time = time()
-        r = log_func(*args, **kwargs)
+        r = func(*args, **kwargs)
         dt = time() - start_time
 
         # Dump the message + the name of this function to the log.
-        log.msg_debug("{} {:.3f} ms".format(func, dt*1000))
+        log.msg_debug("{} {:.3f} ms".format(func.__name__, dt*1000))
 
-        # return whatever log_func has thrown
+        # return whatever func has thrown
         return r
     return _log_wrapper
 

@@ -19,7 +19,7 @@ from . import log
 from . import api
 from . import util
 
-from .util import autolog
+from .util import autolog, memoize
 
 
 class InvalidTemplateDirError(BaseException):

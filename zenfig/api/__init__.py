@@ -14,6 +14,8 @@ A bunch of utilities used by templates
 import re
 import jinja2
 
+from functools import wraps
+
 from .. import log
 from ..util import autolog
 
@@ -21,7 +23,6 @@ from ..util import autolog
 _api_globals = {}
 _api_filters = {}
 
-@autolog
 def apientry(api_func):
     """
     Common routines for all API entries
@@ -29,6 +30,7 @@ def apientry(api_func):
     :param api_func: API function to be wrapped up
     :returns: whatever api_func returns, on exception, it returns None
     """
+    @wraps(api_func)
     def _wrapper(*args, **kwargs):
         try:
             return api_func(*args, **kwargs)

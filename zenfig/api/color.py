@@ -15,18 +15,26 @@ import re
 import webcolors
 import jinja2
 
+from functools import wraps
+
+from ..util import autolog, memoize
+
 from . import _register_filter
 from . import apientry
 
 
 def hexcheck(hex_func):
     """Hexadecimal color sanity check routine"""
+
+    @wraps(hex_func)
     def _wrapper(color):
         if re.match("^[0-9a-fA-F]*$", color):
             color = "#{}".format(color)
         return hex_func(color)
     return _wrapper
 
+@autolog
+@memoize
 @apientry
 @hexcheck
 def normalize_hex(value):
@@ -40,6 +48,7 @@ def normalize_hex(value):
     """
     return webcolors.normalize_hex(value)
 
+@autolog
 @apientry
 def normalize_rgb(rgb_triplet):
     """
@@ -52,7 +61,9 @@ def normalize_rgb(rgb_triplet):
     return webcolors.normalize_triplet(rgb_triplet)
 
 
+@autolog
 @apientry
+@memoize
 @hexcheck
 def hex_to_rgb(hex_value):
     """
@@ -66,7 +77,9 @@ def hex_to_rgb(hex_value):
     return webcolors.hex_to_rgb(hex_value)
 
 
+@autolog
 @apientry
+@memoize
 def rgb_to_hex(rgb_triplet):
     """
     Convert a 3-tuple of integers,
