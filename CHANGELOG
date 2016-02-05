@@ -1,5 +1,16 @@
 Release 0.1.0
 -------------
+* Several optimizations
+* New variable syntax:
+    Variables are resolved using the '@ syntax' instead of using jinja,
+    namely, variables can refer to other user-defined variables indefinitely.
+
+    Example:
+    ---
+    my_var: "asdf"
+    another_var: '{{ @my_var }} {{ @term_color00 }}'
+
+* All decorations have been corrected
 * Kits ecosystem:
   ---------------
   A kit is basically a generic service configuration
