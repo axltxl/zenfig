@@ -84,6 +84,6 @@ def rgb_to_hex(rgb_triplet):
 ###################################
 _register_filter('norm_hex', normalize_hex)
 _register_filter('norm_rgb', normalize_rgb)
-_register_filter('hex_to_rgb', hex_to_rgb)
-_register_filter('rgb_to_hex', rgb_to_hex)
+_register_filter('hex2rgb', hex_to_rgb)
+_register_filter('rgb2hex', rgb_to_hex)
 
