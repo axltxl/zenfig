@@ -20,12 +20,19 @@ from . import __name__ as pkg_name
 def autolog(log_func):
     "Automatically log the current function details."
     def _log_wrapper(*args, **kwargs):
-        # Get the previous frame in the stack, otherwise it would
-        # be this function!!!
-        func = inspect.currentframe().f_back.f_code
+        # get the function name
+        func = log_func.__name__
+
+        # measure its execution time
+        start_time = time()
+        r = log_func(*args, **kwargs)
+        dt = time() - start_time
+
         # Dump the message + the name of this function to the log.
-        log.msg_debug("%s @ %s:%i" % ( func.co_name, func.co_filename, func.co_firstlineno))
-        return log_func(*args, **kwargs)
+        log.msg_debug("{} {:.3f} ms".format(func, dt*1000))
+
+        # return whatever log_func has thrown
+        return r
     return _log_wrapper
 
 @autolog
