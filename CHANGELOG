@@ -1,3 +1,11 @@
+Release 0.1.1
+-------------
+
+* [FIX]: Default terminal colors were incorrect
+* [+] New default variable: term_color_background, defaults to color_base00
+* [+] New default variable: term_color_foreground, defaults to color_base07
+* [+] New default variable: term_color_cursor, defaults to color_base0A
+
 Release 0.1.0
 -------------
 * Line comments can be prefixed with '#'

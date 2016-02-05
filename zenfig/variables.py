@@ -172,6 +172,11 @@ def _get_default_vars():
         # string templates.
         ####################################################
 
+        # general colors
+        "term_color_background": "{{ @color_base00 }}",
+        "term_color_foreground": "{{ @color_base07 }}",
+        "term_color_cursor": "{{ @color_base0A }}",
+
         # 16-color space
         "term_color00": "{{ @color_base01 }}",
         "term_color01": "{{ @color_base09 }}",
