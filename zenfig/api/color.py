@@ -14,7 +14,6 @@ Utilities for color string manipulation
 import re
 import webcolors
 import jinja2
-from decorator import decorate
 
 from . import _register_filter
 from . import apientry

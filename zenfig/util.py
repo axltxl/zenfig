@@ -12,6 +12,7 @@ Utilities
 """
 import os
 import inspect
+from time import time
 from . import log
 
 from . import __name__ as pkg_name

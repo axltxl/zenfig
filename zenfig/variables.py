@@ -244,7 +244,6 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     user_vars = _get_default_vars()
     user_var_locations = {}
     # set locations
-    # TODO: optimize this!
     for user_var in user_vars.keys():
         user_var_locations[user_var] = None
 

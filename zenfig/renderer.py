@@ -26,56 +26,89 @@ class InvalidTemplateDirError(BaseException):
     def __init__(self, directory):
         super().__init__("main.j2 not found in {}".format(directory))
 
+# Regular expression strings used
+# for variable isolation during resolution
+# by _var_resolve
+REGEX_PATT_JINJA2   = '{{.+}}'
+REGEX_PATT_VARIABLE = '@[0-9A-Za-z-_]+'
+REGEX_FMT_VARIABLE  = '@{}'
+REGEX_FMT_VAR_STRIP = '[@]'
+
+_re_jinja2_block = re.compile(REGEX_PATT_JINJA2)
+_re_var = re.compile(REGEX_PATT_VARIABLE)
+_re_var_strip = re.compile(REGEX_FMT_VAR_STRIP)
+
 @autolog
-def _var_resolve(*, name, vars):
-    # extract @{variables}
+def _var_resolve(name, *, vars):
+    """
+    Resolve a variable
+
+    Deduct the value of a variable in vars
+
+    :param name: the needle
+    :param vars: the haze
+    """
+
+    # Only strings are resolved
+    if not isinstance(vars[name], str):
+        return vars[name]
+
+    # We begin by getting current string value
+    # held by this var
     tpl_value = vars[name]
 
-    # only strings are resolved
-    if not isinstance(tpl_value, str):
-        return tpl_value
+    ##########################################################################
+    # Variable recursive resolution:
+    # ------------------------------
+    # Variables must be inside jinja2 blocks in order for them to be resolved.
+    # If other variables are found inside jinja2 blocks, them these are
+    # firstly resolved recursively
+    ##########################################################################
+    for tpl_val_jinja_blk in _re_jinja2_block.findall(tpl_value):
+        for tpl_val_var_name in _re_var.findall(tpl_val_jinja_blk):
 
-    # do this on every jinja substring
-    for tpl_jinja_str in re.findall("{{.+}}", tpl_value):
-
-        # resolve each one of them
-        # if tpl_vars is not None:
-        # for i, var_name in enumerate(tpl_vars):
-        for var_name in re.findall('@{[0-9A-Za-z-_]+}', tpl_jinja_str):
             # strip surrounding chars
-            var_name = re.sub("[@{}]", '',var_name)
+            tpl_val_var_name = _re_var_strip.sub('',tpl_val_var_name)
 
-            #
-            vars[var_name] = _var_resolve(name=var_name, vars=vars)
+            # resolve this variable
+            vars[tpl_val_var_name] = _var_resolve(tpl_val_var_name, vars=vars)
 
-            # once we get the var, make the substitution
+            # Once tpl_val_var_name, has been resolved
+            # then proceed to actual value substitution
+            # on tpl_value (which is the resulting value from resolution)
+            if isinstance(vars[name], str):
+                var_fmt = '"{}"'
+            else:
+                var_fmt = ''
             tpl_value = re.sub(
-                    "@{{{}}}".format(var_name),
-                    '"{}"'.format(vars[var_name]),
-                    tpl_value)
+                REGEX_FMT_VARIABLE.format(tpl_val_var_name),
+                var_fmt.format(vars[tpl_val_var_name]),
+                tpl_value
+            )
 
-    # at this point, all dependent variables
-    # have to be resolved
-    # and we pass it through jinja
+    #############################################################
+    # At this point, all dependent variables have been resolved
+    # However, they are still jinja2 blocks
+    # Meaning, we have to deliver them to jinja2 in order to have
+    # a full resolved value
+    #############################################################
 
-    #
+    # Reasign tpl_value to current var to be rendered
     vars[name] = tpl_value
 
-    ###########################
-    # Load template environment
-    ###########################
-    tpl_env = jinja2.Environment(loader=jinja2.DictLoader(vars))
+    # so we can render this value
+    if _re_jinja2_block.match(vars[name]):
+        # Load template environment
+        tpl_env = jinja2.Environment(loader=jinja2.DictLoader(vars))
 
-    ##################################
-    # Register all globals and filters
-    ##################################
-    _register_api(tpl_env)
+        # Register all globals and filters
+        _register_api(tpl_env)
 
-    #
-    tpl = tpl_env.get_template(name)
+        # Render and deliver, finally!
+        return tpl_env.get_template(name).render(vars)
 
-    if re.match("^{{.*}}$", vars[name]):
-        return tpl.render(vars)
+    # At this point, this string value must be constant,
+    # namely, it has no jinja2 blocks whatsoever
     return tpl_value
 
 @autolog
@@ -95,27 +128,12 @@ def render_dict(vars):
     # logic as well, thus, variables in YAML can
     # reference other variables
     #############################################
-    for tpl_name, tpl_value in vars.items():
-            ################################################################
-            # FIXME: if a var references another var whose value
-            # is also a jinja string, its result becomes quite unpredictable
-            # because depending on what jinja2.Environment.render() does,
-            # some variables from which other ones depend on are rendered
-            # before being used by others, but sometimes only the raw
-            # template string gets assigned to this vars, a workaround has
-            # been to render string variables until they stop being raw string
-            # templates. This works just fine, but, there's gotta be something
-            # better to address this.
-            # TODO: implement an unit test for this function
-            ################################################################
-            # while re.match("^{{.*}}$", vars[tpl_name]):
-                # log.msg_debug("> {} ~~> {}".format(tpl_name, vars[tpl_name]))
-                # vars[tpl_name] = tpl_env.get_template(tpl_name).render(**vars)
-                # log.msg_debug("< {} ~~> {}".format(tpl_name, vars[tpl_name]))
-
-            # resolve @variables
-        if isinstance(tpl_value, str):
-            vars[tpl_name] = _var_resolve(name=tpl_name, vars=vars)
+    tpl_vars_keys = [
+        k for k, v in vars.items()
+        if isinstance(v, str) and re.match(REGEX_PATT_JINJA2, v)
+    ]
+    for tpl_name in tpl_vars_keys:
+        vars[tpl_name] = _var_resolve(tpl_name, vars=vars)
 
     # Give back rendered variables
     return vars
@@ -204,7 +222,9 @@ def render_file(*, vars, template_file, output_file):
     tpl_env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(tpl_searchpath),
         trim_blocks=True,
-        keep_trailing_newline=True
+        keep_trailing_newline=True,
+        line_comment_prefix="#",
+        line_statement_prefix="%",
     )
 
     # set user's environment variables inside globals
