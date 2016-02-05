@@ -17,13 +17,13 @@ def test_color_normalize_hex():
 
     # Invalid colors
     eq_(color.normalize_hex("ffff"),    None)
-    eq_(color.normalize_hex("affffs"),    None)
-    eq_(color.normalize_hex(""),    None)
+    eq_(color.normalize_hex("affffs"),  None)
+    eq_(color.normalize_hex(""),        None)
     eq_(color.normalize_hex("##ffff"),  None)
     eq_(color.normalize_hex("#rfff54"), None)
 
     # Invalid types
-    eq_(color.normalize_hex(123), None)
+    eq_(color.normalize_hex(123),  None)
     eq_(color.normalize_hex(True), None)
     eq_(color.normalize_hex(set([1,2,3])), None)
 
@@ -36,13 +36,13 @@ def test_color_hex_to_rgb():
 
     # Invalid colors
     eq_(color.hex_to_rgb("ffff"),    None)
-    eq_(color.hex_to_rgb("affffs"),    None)
-    eq_(color.hex_to_rgb(""),    None)
+    eq_(color.hex_to_rgb("affffs"),  None)
+    eq_(color.hex_to_rgb(""),        None)
     eq_(color.hex_to_rgb("##ffff"),  None)
     eq_(color.hex_to_rgb("#rfff54"), None)
 
     # Invalid types
-    eq_(color.hex_to_rgb(123), None)
+    eq_(color.hex_to_rgb(123),  None)
     eq_(color.hex_to_rgb(True), None)
     eq_(color.hex_to_rgb(set([1,2,3])), None)
 

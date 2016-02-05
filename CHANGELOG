@@ -1,3 +1,51 @@
+Release 0.1.0
+-------------
+* Line comments can be prefixed with '#'
+* Line statements are prefixed with '%'
+* Several optimizations
+* New variable syntax:
+    Variables are resolved using the '@ syntax' instead of using jinja,
+    namely, variables can refer to other user-defined variables indefinitely.
+
+    Example:
+    ---
+    my_var: "asdf"
+    another_var: '{{ @my_var }} {{ @term_color00 }}'
+
+* All decorations have been corrected
+* Kits ecosystem:
+  ---------------
+  A kit is basically a generic service configuration
+  schema with both variable and template files targeting
+  a specific service (e.g. i3wm). Kits can be downloaded
+  and rendered using local variables set by the user.
+
+  Kits are basically file system with the following
+  layout:
+
+  * Kit root
+  |
+  |__* templates
+  | |__ main.j2
+  | |__ (*.j2)
+  |__* defaults
+     |__ varfile.yml
+     |__ hello.yml
+     |__ (*.yml)
+
+  Once the kit has been downloaded by the mean used,
+  it gets rendered using established user variables.
+  Variable search paths are applied as always, defaults
+  set by the kit will be take into account the last
+  just after XDG_DATA_HOME/zenfig/vars.
+
+* Defaults/facts ecosystem:
+  --------------------
+  A bunch of variables are set by default by zenfig
+  at startup time, these are default variables and facts
+  the former are mutable and the latters are not, for the
+  moment, they cover basics and will grow along new releases.
+
 Release 0.0.1
 -------------
 

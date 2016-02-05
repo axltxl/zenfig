@@ -24,10 +24,12 @@ from zenfig import log
 from zenfig import variables
 from zenfig import PKG_URL as pkg_url
 from zenfig import __name__ as pkg_name, __version__ as pkg_version
+from zenfig import kit
 
 def parse_args(argv):
-    """Usage: zenfig [-v]... [-I <varfile>]... [-o <file>] <template_file>
+    """Usage: zenfig [-v]... [-I <varfile>]... [-o <file>] (<template_file> | -k <kit>)
 
+    -k, --kit <kit>  Render kit (needs better explanation)
     -I <varfile>, --include <varfile>  Variables file/directory to include
     -v  Output verbosity
     -o FILE, --output-file FILE  Output file
@@ -65,35 +67,53 @@ def start(*, options):
     # measure execution time properly
     start_time = time.time()
 
-    ##########################
-    # Get variables themselves
-    ##########################
-    var_files = variables.normalize_search_path(options['--include'])
-    log.msg_debug("Variables search path:")
-    log.msg_debug("**********************")
-    for vf in var_files:
-        log.msg_debug(vf)
-    log.msg_debug("**********************")
+    # Template file taken from args
     template_file = options['<template_file>']
 
-    # Obtain variables from variable files
-    vars, files = variables.get_vars(var_files=var_files)
-    vars = renderer.render_dict(vars)
+    # Variable locations taken from args
+    user_var_files = options['--include']
 
-    # Print vars
-    log.msg("All variable files have been read.")
-    log.msg("**********************************")
-    for key, value in vars.items():
-        log.msg("{:16} => '{}' [{}]".format(key, value, files[key]), bold=True)
-    log.msg("**********************************")
+
+    ###################################
+    # Initialize kit interface:
+    # This will deduct what type of kit
+    # this is dealing with, it will load
+    # the appropiate interface based on
+    # kit_name.
+    ###################################
+    kit_name = options['--kit']
+    kit_var_dir = None
+
+    if template_file is None:
+
+        # Initialise kit interface
+        kit.init(kit_name)
+
+        # Get variables location for this kit
+        kit_var_dir = kit.get_var_dir(kit_name)
+
+        # get template main dir from kit
+        template_file = kit.get_template_dir(kit_name)
+
+        # mark the thing
+        log.msg_warn("Found kit: {}".format(kit_name))
+
+    ####################
+    # Get user variables
+    ####################
+    user_vars = variables.get_user_vars(
+        user_var_files=user_var_files,
+        kit_var_dir=kit_var_dir
+    )
 
     #######################
     # Render that template!
     #######################
     output_file = options['--output-file']
     renderer.render_file(
-        vars=vars, template_file=template_file,
-        output_file=output_file
+        vars=user_vars,
+        template_file=template_file,
+        output_file=output_file,
     )
 
     # Measure execution time
@@ -110,7 +130,7 @@ def _handle_except(e):
     log.msg_err("Unhandled {e} at {file}:{line}: '{msg}'" .format(
         e=exc_type.__name__, file=fname,
         line=exc_tb.tb_lineno, msg=e))
-    log.msg_err(traceback.format_exc())
+    log.msg_debug(traceback.format_exc())
     log.msg_err("An error has occurred!. "
                 "For more details, review the logs.")
     return 1
@@ -124,7 +144,6 @@ def main(argv=None):
     # Exit code
     exit_code = 0
 
-
     # First, we change main() to take an optional 'argv'
     # argument, which allows us to call it from the interactive
     # Python prompt
@@ -132,18 +151,13 @@ def main(argv=None):
         argv = sys.argv[1:]
 
     try:
-        # Bootstrap
-        options = parse_args(argv)
-
         # start the thing!
         start(options=parse_args(argv))
     except DocoptExit as dexcept:
-
         # Deal with wrong arguments
         print(dexcept)
         exit_code = 1
-    except Exception as e:
-
+    except BaseException as e:
         # ... and if everything else fails
         _handle_except(e)
         exit_code = 1
