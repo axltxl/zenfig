@@ -37,10 +37,10 @@ Release 0.1.0
   set by the kit will be take into account the last
   just after XDG_DATA_HOME/zenfig/vars.
 
-* Variables ecosystem:
+* Defaults/facts ecosystem:
   --------------------
   A bunch of variables are set by default by zenfig
-  at startup time, these are default and built-in variables,
+  at startup time, these are default variables and facts
   the former are mutable and the latters are not, for the
   moment, they cover basics and will grow along new releases.
 
