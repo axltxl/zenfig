@@ -15,6 +15,7 @@ import yaml
 import re
 import os
 
+from . import __name__ as pkg_name
 from . import log
 from . import util
 from . import renderer
@@ -202,8 +203,12 @@ def _get_default_vars():
     # Give those variables already!
     return default_vars
 
+def _create_fact(facts, key, value):
+    prefix = pkg_name
+    facts["{}_{}".format(prefix, key)] = value
+
 @autolog
-def _get_builtin_vars():
+def _get_facts():
     """
     Get built-in variables
 
@@ -213,15 +218,16 @@ def _get_builtin_vars():
     :return: A dictionary with a bunch of scavenged variables
     """
 
-    # The very basics
-    path = os.getenv("PATH").split(":")
-    home = os.getenv("HOME")
+    # these are the facts
+    facts = {}
+
+    _create_fact(facts, 'env', os.environ)
+    _create_fact(facts, 'sys_path', os.getenv("PATH").split(":"))
+    _create_fact(facts, 'user', os.getenv('USER'))
+    _create_fact(facts, 'user_home', os.getenv('HOME'))
 
     # Give those variables already!
-    return {
-        "path": path,
-        "home": home
-    }
+    return facts
 
 @autolog
 def get_user_vars(*, user_var_files, kit_var_dir):
@@ -261,16 +267,14 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     log.msg_debug("**********************")
 
     ########################################
-    # Set builtin variables
-    # They are set at this point so they are
-    # sort-of read-only
+    # Set facts
     ########################################
-    builtin_vars = _get_builtin_vars()
-    builtin_var_locations = {}
-    for builtin_var in builtin_vars.keys():
-        builtin_var_locations[builtin_var] = None
-    user_vars.update(builtin_vars)
-    user_var_locations.update(builtin_var_locations)
+    facts = _get_facts()
+    fact_locations = {}
+    for fact in facts.keys():
+        fact_locations[fact] = 'fact'
+    user_vars.update(facts)
+    user_var_locations.update(fact_locations)
 
     ######################################################
     # Obtain variables from variable files set by the user
