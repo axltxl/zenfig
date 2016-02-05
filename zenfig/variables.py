@@ -147,6 +147,7 @@ def _get_default_vars():
     ###############
     font_settings = {
         "font": "Sans",
+        "font_icon": "FontAwesome",
         "font_size": 10,
         "font_antialiasing": True,
         "font_hinting": True,
