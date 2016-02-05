@@ -285,7 +285,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     # Variables whose values are strings may
     # have jinja2 logic within them as well
     # so we render those values through jinja
-    # so, we merge defaults and builtins with
+    # so, we merge defaults and facts with
     # user-set values to get the final picture
     user_vars.update(renderer.render_dict(user_vars))
 
@@ -307,7 +307,7 @@ def list_vars(*, vars, locations):
     for key, value in sorted(vars.items()):
         location = locations[key]
         if location is None:
-            location = "built-in"
+            location = "default"
         if isinstance(value, list):
             log.msg("{:24} [list] [{}]".format(key, location))
             for subvalue in value:
