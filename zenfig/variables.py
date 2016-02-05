@@ -171,30 +171,30 @@ def _get_default_vars():
         ####################################################
 
         # 16-color space
-        "term_color00": "{{ color_base00 }}",
-        "term_color01": "{{ color_base08 }}",
-        "term_color02": "{{ color_base0B }}",
-        "term_color03": "{{ color_base0A }}",
-        "term_color04": "{{ color_base0D }}",
-        "term_color05": "{{ color_base0E }}",
-        "term_color06": "{{ color_base0C }}",
-        "term_color07": "{{ color_base05 }}",
-        "term_color08": "{{ color_base03 }}",
-        "term_color09": "{{ color_base08 }}",
-        "term_color10": "{{ color_base0B }}",
-        "term_color11": "{{ color_base0A }}",
-        "term_color12": "{{ color_base0D }}",
-        "term_color13": "{{ color_base0E }}",
-        "term_color14": "{{ color_base0E }}",
-        "term_color15": "{{ color_base07 }}",
+        "term_color00": "{{ @color_base00 }}",
+        "term_color01": "{{ @color_base08 }}",
+        "term_color02": "{{ @color_base0B }}",
+        "term_color03": "{{ @color_base0A }}",
+        "term_color04": "{{ @color_base0D }}",
+        "term_color05": "{{ @color_base0E }}",
+        "term_color06": "{{ @color_base0C }}",
+        "term_color07": "{{ @color_base05 }}",
+        "term_color08": "{{ @color_base03 }}",
+        "term_color09": "{{ @color_base08 }}",
+        "term_color10": "{{ @color_base0B }}",
+        "term_color11": "{{ @color_base0A }}",
+        "term_color12": "{{ @color_base0D }}",
+        "term_color13": "{{ @color_base0E }}",
+        "term_color14": "{{ @color_base0E }}",
+        "term_color15": "{{ @color_base07 }}",
 
         # 256-color space
-        "term_color16": "{{ color_base09 }}",
-        "term_color17": "{{ color_base0F }}",
-        "term_color18": "{{ color_base01 }}",
-        "term_color19": "{{ color_base02 }}",
-        "term_color20": "{{ color_base04 }}",
-        "term_color21": "{{ color_base06 }}",
+        "term_color16": "{{ @color_base09 }}",
+        "term_color17": "{{ @color_base0F }}",
+        "term_color18": "{{ @color_base01 }}",
+        "term_color19": "{{ @color_base02 }}",
+        "term_color20": "{{ @color_base04 }}",
+        "term_color21": "{{ @color_base06 }}",
     }
     # Insert on defaults
     default_vars.update(term_settings)
@@ -244,7 +244,6 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     user_vars = _get_default_vars()
     user_var_locations = {}
     # set locations
-    # TODO: optimize this!
     for user_var in user_vars.keys():
         user_var_locations[user_var] = None
 
@@ -299,7 +298,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
 def list_vars(*, vars, locations):
     """Print all vars given"""
 
-    log.msg("All variable files have been read.")
+    log.msg("{} variable(s) captured".format(len(vars)))
     log.msg("**********************************")
     for key, value in sorted(vars.items()):
         location = locations[key]

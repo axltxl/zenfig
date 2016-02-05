@@ -13,22 +13,31 @@ Utilities for color string manipulation
 
 import re
 import webcolors
+import jinja2
+
+from functools import wraps
+
+from ..util import autolog, memoize
 
 from . import _register_filter
-from . import api_entry
+from . import apientry
 
 
-def _hex_check(hex_func):
+def hexcheck(hex_func):
     """Hexadecimal color sanity check routine"""
+
+    @wraps(hex_func)
     def _wrapper(color):
         if re.match("^[0-9a-fA-F]*$", color):
             color = "#{}".format(color)
         return hex_func(color)
     return _wrapper
 
-@api_entry
-@_hex_check
-def normalize_hex(hex_value):
+@autolog
+@memoize
+@apientry
+@hexcheck
+def normalize_hex(value):
     """
     Normalize a hexadecimal color value to a string
     followed by six lowercase hexadecimal digits (what
@@ -37,10 +46,10 @@ def normalize_hex(hex_value):
     :param hex_value: The hexadecimal color value to normalize.
     :returns: A normalized 6-digit hexadecimal color prepended with a #
     """
+    return webcolors.normalize_hex(value)
 
-    return webcolors.normalize_hex(hex_value)
-
-@api_entry
+@autolog
+@apientry
 def normalize_rgb(rgb_triplet):
     """
     Normalize an integer rgb() triplet so that
@@ -52,8 +61,10 @@ def normalize_rgb(rgb_triplet):
     return webcolors.normalize_triplet(rgb_triplet)
 
 
-@api_entry
-@_hex_check
+@autolog
+@apientry
+@memoize
+@hexcheck
 def hex_to_rgb(hex_value):
     """
     Convert a hexadecimal color value to a
@@ -66,7 +77,9 @@ def hex_to_rgb(hex_value):
     return webcolors.hex_to_rgb(hex_value)
 
 
-@api_entry
+@autolog
+@apientry
+@memoize
 def rgb_to_hex(rgb_triplet):
     """
     Convert a 3-tuple of integers,
@@ -84,6 +97,6 @@ def rgb_to_hex(rgb_triplet):
 ###################################
 _register_filter('norm_hex', normalize_hex)
 _register_filter('norm_rgb', normalize_rgb)
-_register_filter('hex_to_rgb', hex_to_rgb)
-_register_filter('rgb_to_hex', rgb_to_hex)
+_register_filter('hex2rgb', hex_to_rgb)
+_register_filter('rgb2hex', rgb_to_hex)
 
