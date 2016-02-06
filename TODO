@@ -1,2 +1,3 @@
 Milestone 0.2:
 * No single git repo for kits, use individual git repos for each kit
+* Consolidate template trimming
