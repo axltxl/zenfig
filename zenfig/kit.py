@@ -79,7 +79,7 @@ def init(kit_name, *, provider=None):
         log.msg_debug("Kit provider '{}' has been imposed!".format(provider))
 
     # Initiate kit provider
-    _kit_provider.init()
+    _kit_provider.init(kit_name)
 
 @_kit_check
 @autolog
