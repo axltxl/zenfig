@@ -1,3 +1,15 @@
+Release 0.2.0
+-------------
+* [+] Kit interface revamped
+    > Git: kits are treated as individual repositories under a single cache,
+    rather than just a master repo with all stuff within it.
+    > Git: kits must be specified as <user_name>/<repo_name>, this will
+    default lookup to github.
+    > Minor kit interface changes in order for new features to be fulfilled
+    > Git: kits are only updated if local copy is more than 3 days old
+    > Git: Local copies of kits must not weight more than 2 MiB
+    > Git: Entire URLs can be specified instead of default <user>/<repo>
+
 Release 0.1.1
 -------------
 

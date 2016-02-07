@@ -23,7 +23,7 @@ def _get_kit_dir(kit_name):
     return os.path.abspath(kit_name)
 
 @autolog
-def init():
+def init(kit_name):
     """Initialise kit provider"""
     pass
 
