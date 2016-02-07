@@ -115,7 +115,7 @@ def _cache_isvalid(kit_name):
 
     # is it an actual directory?
     if not os.path.isdir(git_repo_path) or \
-    os.path.islink(git_repo_path):
+    not os.path.islink(git_repo_path):
         log.msg_err("Kit cache is not a valid directory!")
 
     # is it taking too much of your hard drive?
