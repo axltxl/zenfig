@@ -12,6 +12,7 @@ Git kit interface
 """
 
 import os
+import re
 from time import time
 
 import git
@@ -25,7 +26,6 @@ from ..util import autolog
 from . import __kit_isvalid
 
 # Essential git repo variables
-#TODO: if kit_name comes as an URL, don't use this
 GIT_REPO_PREFIX_DEFAULT = "https://github.com"
 GIT_BRANCH = "master"
 GIT_REF  = "refs/heads/{}".format(GIT_BRANCH)
@@ -62,19 +62,31 @@ def _cache_create(kit_name):
     # Clone the kit repository
     # kit repos can be specified as <user_name>/<repo_name>.
     # For the moment, only github repos will be looked up on this provider
+    # That is, unless, you specify an URL
     ########################################################
-    git_repo_prefix, git_repo_name = kit_name.split('/')
-    try:
-        # try zenfig- prefix on git repo, first
-        git_repo_remote = "{}/{}/zenfig-{}.git".format(
-            GIT_REPO_PREFIX_DEFAULT, git_repo_prefix, git_repo_name
-        )
+    if not re.match("^http", kit_name):
+        try:
+            # We asume <user_name>/<repo_name> came by
+            git_repo_prefix, git_repo_name = kit_name.split('/')
+
+            # try zenfig- prefix on git repo, first
+            git_repo_remote = "{}/{}/zenfig-{}.git".format(
+                GIT_REPO_PREFIX_DEFAULT,
+                git_repo_prefix, git_repo_name
+            )
+
+            # Clone the repo
+            git_repo = _clone_repo(git_repo_remote, git_repo_path)
+        except GitCommandError:
+            git_repo_remote = "{}/{}/{}.git".format(
+                GIT_REPO_PREFIX_DEFAULT,
+                git_repo_prefix, git_repo_name
+            )
+    else:
+        git_repo_remote = kit_name
+
+        # Clone the repo
         git_repo = _clone_repo(git_repo_remote, git_repo_path)
-    except GitCommandError:
-        git_repo_remote = "{}/{}/{}.git".format(
-            GIT_REPO_PREFIX_DEFAULT, git_repo_prefix, git_repo_name
-        )
-        git_repo = _clone_repo(git_repo_remote)
 
     # give back the cloned git repository
     return git_repo
