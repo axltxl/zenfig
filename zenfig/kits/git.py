@@ -19,11 +19,11 @@ import git
 from git.exc import InvalidGitRepositoryError
 from git.exc import GitCommandError
 
+from . import Kit
+
 from .. import log
 from .. import util
 from ..util import autolog
-
-from . import __kit_isvalid
 
 # Essential git repo variables
 GIT_REPO_PREFIX_DEFAULT = "https://github.com"
@@ -115,7 +115,7 @@ def _cache_isvalid(kit_name):
 
     # is it an actual directory?
     if not os.path.isdir(git_repo_path) or \
-    not os.path.islink(git_repo_path):
+       os.path.islink(git_repo_path):
         log.msg_err("Kit cache is not a valid directory!")
 
     # is it taking too much of your hard drive?
@@ -188,24 +188,14 @@ def _cache_update(kit_name):
         if head.name == GIT_BRANCH:
             head.checkout(force=True)
 
+
 @autolog
 def _get_kit_dir(kit_name):
     return "{}/{}".format(KIT_CACHE_HOME, kit_name)
 
 @autolog
-def init(kit_name):
+def get_kit(kit_name):
     """Initialise kit provider"""
+
     _cache_update(kit_name)
-
-@autolog
-def kit_isvalid(kit_name):
-    return __kit_isvalid(_get_kit_dir(kit_name))
-
-@autolog
-def get_template_dir(kit_name):
-    return "{}/templates".format(_get_kit_dir(kit_name))
-
-@autolog
-def get_var_dir(kit_name):
-    return "{}/defaults".format(_get_kit_dir(kit_name))
-
+    return Kit(kit_name, root_dir=_get_kit_dir(kit_name))

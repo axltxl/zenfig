@@ -27,9 +27,8 @@ from zenfig import __name__ as pkg_name, __version__ as pkg_version
 from zenfig import kit
 
 def parse_args(argv):
-    """Usage: zenfig [-v]... [-I <varfile>]... [-o <file>] (<template_file> | -k <kit>)
+    """Usage: zenfig [-v]... [-I <varfile>]... (install) <kit>
 
-    -k, --kit <kit>  Render kit (needs better explanation)
     -I <varfile>, --include <varfile>  Variables file/directory to include
     -v  Output verbosity
     -o FILE, --output-file FILE  Output file
@@ -67,12 +66,8 @@ def start(*, options):
     # measure execution time properly
     start_time = time.time()
 
-    # Template file taken from args
-    template_file = options['<template_file>']
-
     # Variable locations taken from args
     user_var_files = options['--include']
-
 
     ###################################
     # Initialize kit interface:
@@ -81,40 +76,38 @@ def start(*, options):
     # the appropiate interface based on
     # kit_name.
     ###################################
-    kit_name = options['--kit']
-    kit_var_dir = None
+    kit_name = options['<kit>']
 
-    if template_file is None:
+    # Initialise kit interface
+    _kit = kit.get_kit(kit_name)
 
-        # Initialise kit interface
-        kit.init(kit_name)
-
-        # Get variables location for this kit
-        kit_var_dir = kit.get_var_dir(kit_name)
-
-        # get template main dir from kit
-        template_file = kit.get_template_dir(kit_name)
-
-        # mark the thing
-        log.msg_warn("Found kit: {}".format(kit_name))
+    # mark the thing
+    log.msg_warn("Found kit: {}".format(kit_name))
 
     ####################
     # Get user variables
     ####################
     user_vars = variables.get_user_vars(
         user_var_files=user_var_files,
-        kit_var_dir=kit_var_dir
+        kit_var_dir=_kit.var_dir
     )
 
-    #######################
-    # Render that template!
-    #######################
-    output_file = options['--output-file']
-    renderer.render_file(
-        vars=user_vars,
-        template_file=template_file,
-        output_file=output_file,
-    )
+    for template, template_data in _kit.templates.items():
+
+        # Obtain basic information from the kit
+        output_file = template_data['output_file']
+        template_file = template_data['path']
+        template_include_dirs = template_data['include']
+
+        #######################
+        # Render that template!
+        #######################
+        renderer.render_file(
+            vars=user_vars,
+            template_file=template_file,
+            template_include_dirs=template_include_dirs,
+            output_file=output_file,
+        )
 
     # Measure execution time
     log.msg("Done! ({:.3f} ms)".format((time.time() - start_time)*1000))
