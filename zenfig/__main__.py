@@ -27,7 +27,7 @@ from zenfig import __name__ as pkg_name, __version__ as pkg_version
 from zenfig import kit
 
 def parse_args(argv):
-    """Usage: zenfig [-v]... [-I <varfile>]... (install) <kit>
+    """Usage: zenfig [-v]... [-I <varfile>]... (install|preview) <kit>
 
     -I <varfile>, --include <varfile>  Variables file/directory to include
     -v  Output verbosity
@@ -95,9 +95,17 @@ def start(*, options):
     for template, template_data in _kit.templates.items():
 
         # Obtain basic information from the kit
-        output_file = template_data['output_file']
         template_file = template_data['path']
         template_include_dirs = template_data['include']
+
+        # Depending on command set, the file would be either
+        # displayed on screen or written onto a file
+        if not options['preview']:
+            output_file = template_data['output_file']
+        else:
+            log.msg_warn('Previewing file: {}'.format(template_data['output_file']))
+            log.msg_warn('---')
+            output_file = None
 
         #######################
         # Render that template!
@@ -108,6 +116,10 @@ def start(*, options):
             template_include_dirs=template_include_dirs,
             output_file=output_file,
         )
+
+        # Mark the end of previewed file
+        if options['preview']:
+            log.msg_warn('---')
 
     # Measure execution time
     log.msg("Done! ({:.3f} ms)".format((time.time() - start_time)*1000))
