@@ -6,7 +6,7 @@ zenfig.kits
 
 Some message
 
-:copyright: (c) 2015 by Alejandro Ricoveri
+:copyright: (c) 2016 by Alejandro Ricoveri
 :license: MIT, see LICENSE for more details.
 
 """
