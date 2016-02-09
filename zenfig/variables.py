@@ -319,8 +319,8 @@ def list_vars(*, vars, locations):
             for subvalue in value:
                 log.msg("    => {}".format(subvalue))
         elif isinstance(value, dict):
-            log.msg("{:24} [list] [{}]".format(key, location))
-            for k, v in value:
+            log.msg("{:24} [dict] [{}]".format(key, location))
+            for k, v in value.items():
                 log.msg("  {:24}  => {}".format(k, v))
         else:
             log.msg("{:24} = '{}' [{}]".format(key, value, location))
