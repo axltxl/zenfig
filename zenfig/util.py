@@ -54,7 +54,7 @@ def autolog(func):
         dt = time() - start_time
 
         # Dump the message + the name of this function to the log.
-        log.msg_debug("{} {:.3f} ms".format(func.__name__, dt*1000))
+        log.msg_debug("{} (t = {:.3f} ms)".format(func.__name__, dt*1000))
 
         # return whatever func has thrown
         return r
