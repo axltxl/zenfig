@@ -14,6 +14,8 @@ Kit interface
 import os
 import re
 
+import yaml
+
 from . import log
 from . import util
 from .util import autolog
@@ -42,15 +44,7 @@ def _set_provider(provider):
     log.msg_debug("Using kit provider: {}".format(provider))
 
 @autolog
-def _kit_check(kit_func):
-    def _wrapper(kit_name):
-        if not _kit_provider.kit_isvalid(kit_name):
-            raise InvalidKitError(kit_name)
-        return kit_func(kit_name)
-    return _wrapper
-
-@autolog
-def init(kit_name, *, provider=None):
+def get_kit(kit_name, *, provider=None):
     """
     Initialize kit interface
 
@@ -59,6 +53,7 @@ def init(kit_name, *, provider=None):
 
     :param kit_name: Name of the kit to be loaded
     :param provider: Kit provider to be used to load kit_name
+    :returns: a Kit holding all relevant information about kit_name
     """
 
     # if provider has not been enforced
@@ -88,28 +83,4 @@ def init(kit_name, *, provider=None):
         log.msg_debug("Kit provider '{}' has been imposed!".format(provider))
 
     # Initiate kit provider
-    _kit_provider.init(kit_name)
-
-@_kit_check
-@autolog
-def get_var_dir(kit_name):
-    """
-    Get variable location from kit_name
-
-    :param kit_name: Kit name
-    :returns:
-        Full path to the variables directory of the kit.
-    """
-    return _kit_provider.get_var_dir(kit_name)
-
-@_kit_check
-@autolog
-def get_template_dir(kit_name):
-    """
-    Get template location from kit_name
-
-    :param kit_name: Kit name
-    :returns:
-        Full path to the templates directory of the kit.
-    """
-    return _kit_provider.get_template_dir(kit_name)
+    return _kit_provider.get_kit(kit_name)

@@ -1,6 +1,18 @@
 Release 0.2.0
 -------------
+* [-] For the sake of preventing clutter, zenfig only works with kits, not
+      individual templates, it still uses the same variable system. Users
+      can still determine where to put their variables and how to specify them,
+      but templates are not read freely anymore, only kits.
+* [-] Template search is confined to directories inside the 'templates'
+      directory of the specified kit.
+* [+] Command-based interaction: zenfig [options] <command> <kit>
+* [+] New command 'install' tells zenfig to render all specified 'output_files'
+      from a kit into their respective destinations.
 * [+] Kit interface revamped
+    > General: kit interface gives the outside an instance of Kit which deals
+      with all things regarding information about a kit file system to be used
+      by other modules.
     > Git: kits are treated as individual repositories under a single cache,
     rather than just a master repo with all stuff within it.
     > Git: kits must be specified as <user_name>/<repo_name>, this will
