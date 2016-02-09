@@ -216,9 +216,9 @@ def _create_fact(facts, key, value):
 @autolog
 def _get_facts():
     """
-    Get built-in variables
+    Get facts
 
-    Built-in variables are immutable global variables
+    Facts are immutable global variables
     set at the very end of variable resolution.
 
     :return: A dictionary with a bunch of scavenged variables
@@ -227,7 +227,7 @@ def _get_facts():
     # these are the facts
     facts = {}
 
-    _create_fact(facts, 'env', os.environ)
+    _create_fact(facts, 'env', dict(os.environ))
     _create_fact(facts, 'sys_path', os.getenv("PATH").split(":"))
     _create_fact(facts, 'user', os.getenv('USER'))
     _create_fact(facts, 'user_home', os.getenv('HOME'))
