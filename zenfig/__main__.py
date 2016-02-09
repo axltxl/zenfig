@@ -81,9 +81,6 @@ def start(*, options):
     # Initialise kit interface
     _kit = kit.get_kit(kit_name)
 
-    # mark the thing
-    log.msg_warn("Found kit: {}".format(kit_name))
-
     ####################
     # Get user variables
     ####################
