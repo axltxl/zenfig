@@ -26,6 +26,7 @@ from zenfig import PKG_URL as pkg_url
 from zenfig import __name__ as pkg_name, __version__ as pkg_version
 from zenfig import kit
 
+
 def parse_args(argv):
     """Usage: zenfig [-v]... [-I <varfile>]... (install|preview) <kit>
 
@@ -89,7 +90,7 @@ def start(*, options):
         kit_var_dir=_kit.var_dir
     )
 
-    for template, template_data in _kit.templates.items():
+    for template_data in _kit.templates.values():
 
         # Obtain basic information from the kit
         template_file = template_data['path']
@@ -100,7 +101,9 @@ def start(*, options):
         if not options['preview']:
             output_file = template_data['output_file']
         else:
-            log.msg_warn('Previewing file: {}'.format(template_data['output_file']))
+            log.msg_warn('Previewing file: {}'.format(
+                template_data['output_file']
+            ))
             log.msg_warn('---')
             output_file = None
 
@@ -121,6 +124,7 @@ def start(*, options):
     # Measure execution time
     log.msg("Done! ({:.3f} ms)".format((time.time() - start_time)*1000))
 
+
 def _handle_except(e):
     """
     Handle (log) any exception
@@ -136,6 +140,7 @@ def _handle_except(e):
     log.msg_err("An error has occurred!. "
                 "For more details, review the logs.")
     return 1
+
 
 def main(argv=None):
     """
