@@ -16,16 +16,7 @@ import re
 
 from . import log
 from .util import autolog
-from .kits import git, local
-
-
-class InvalidKitError(BaseException):
-    """Basic Kit exception"""
-
-    def __init__(self, message):
-        super().__init__(
-            "{} does not have a valid file system.".format(message)
-        )
+from .kits import git, local, InvalidKitError
 
 
 @autolog

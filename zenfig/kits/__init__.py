@@ -15,9 +15,15 @@ import os
 import yaml
 from voluptuous import Schema, Optional
 
-from . import InvalidKitError
 from ..util import autolog
 
+class InvalidKitError(BaseException):
+    """Basic Kit exception"""
+
+    def __init__(self, message):
+        super().__init__(
+            "{} does not have a valid file system.".format(message)
+        )
 
 class Kit:
     """
