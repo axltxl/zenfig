@@ -32,13 +32,70 @@ class InvalidTemplateDirError(BaseException):
 # for variable isolation during resolution
 # by _var_resolve
 REGEX_PATT_JINJA2 = '{{.+}}'
-REGEX_PATT_VARIABLE = '@[0-9A-Za-z-_]+'
-REGEX_FMT_VARIABLE = '@{}'
-REGEX_FMT_VAR_STRIP = '[@]'
-
 REGEX_JINJA2 = re.compile(REGEX_PATT_JINJA2)
-REGEX_VAR = re.compile(REGEX_PATT_VARIABLE)
+
+# Regular expressions for _var_strip
+REGEX_PATT_VAR = '@[0-9A-Za-z-_]+'
+REGEX_FMT_VAR = '@{}'
+REGEX_FMT_VAR_STRIP = '[@]'
+REGEX_VAR = re.compile(REGEX_PATT_VAR)
 REGEX_VAR_STRIP = re.compile(REGEX_FMT_VAR_STRIP)
+
+
+@autolog
+def _var_strip(
+    vars,
+    name,
+    tpl_val_jinja_blk,
+    tpl_value,
+    *,
+    regex_var,
+    regex_var_strip,
+    regex_fmt_var
+):
+    """
+    Variable substitution
+
+    Tokenize variables from a jinja2 block and substitute them
+    with their resolved variables.
+
+    :param vars: A list of all variables to be used
+    :param tpl_var_jinja_blk: A jinja2 block string
+    :param tpl_value: Value of the variable 'name'
+    :param name: Name of the whose value is going to be resolved
+    :param regex_var: Regular expression for variable tokenization
+    :param regex_var_strip: Regular expression for variable stripping
+    :param regex_fmt_var: String format for variable reinsertion into tpl_val_jinja_blk
+    :returns: A jinja2 string with all inner variables resolved
+    """
+
+    for tpl_val_var_name in regex_var.findall(tpl_val_jinja_blk):
+
+        # strip surrounding chars
+        tpl_val_var_name = regex_var_strip.sub('', tpl_val_var_name)
+
+        # resolve this variable
+        vars[tpl_val_var_name] = _var_resolve(tpl_val_var_name, vars=vars)
+
+        # Once tpl_val_var_name, has been resolved
+        # then proceed to actual value substitution
+        # on tpl_value (which is the resulting value from resolution)
+        if isinstance(vars[name], str):
+            var_fmt = '"{}"'
+        else:
+            var_fmt = ''
+
+        # Variable reinsertion into tpl_value
+        # Each resolved variable that was inside each jinja2 block
+        # is replaced with its resolved value
+        tpl_value = re.sub(
+            regex_fmt_var.format(tpl_val_var_name),
+            var_fmt.format(vars[tpl_val_var_name]),
+            tpl_value
+        )
+
+    # give the thing back!
+    return tpl_value
 
 
 @autolog
@@ -68,26 +125,12 @@ def _var_resolve(name, *, vars):
     # firstly resolved recursively
     ##########################################################################
     for tpl_val_jinja_blk in REGEX_JINJA2.findall(tpl_value):
-        for tpl_val_var_name in REGEX_VAR.findall(tpl_val_jinja_blk):
-
-            # strip surrounding chars
-            tpl_val_var_name = REGEX_VAR_STRIP.sub('', tpl_val_var_name)
-
-            # resolve this variable
-            vars[tpl_val_var_name] = _var_resolve(tpl_val_var_name, vars=vars)
-
-            # Once tpl_val_var_name, has been resolved
-            # then proceed to actual value substitution
-            # on tpl_value (which is the resulting value from resolution)
-            if isinstance(vars[name], str):
-                var_fmt = '"{}"'
-            else:
-                var_fmt = ''
-            tpl_value = re.sub(
-                REGEX_FMT_VARIABLE.format(tpl_val_var_name),
-                var_fmt.format(vars[tpl_val_var_name]),
-                tpl_value
-            )
+        # Resolve each variable inside each jinja2 block
+        tpl_value = _var_strip(
+            vars, name, tpl_val_jinja_blk, tpl_value,
+            regex_var=REGEX_VAR, regex_var_strip=REGEX_VAR_STRIP,
+            regex_fmt_var=REGEX_FMT_VAR
+        )
 
     #############################################################
     # At this point, all dependent variables have been resolved
@@ -108,7 +151,7 @@ def _var_resolve(name, *, vars):
         _register_api(tpl_env)
 
         # Render and deliver, finally!
-        return util.str2whatever(tpl_env.get_template(name).render(vars))
+        return tpl_env.get_template(name).render(vars)
 
     # At this point, this string value must be constant,
     # namely, it has no jinja2 blocks whatsoever
