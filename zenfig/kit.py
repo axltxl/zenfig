@@ -14,34 +14,19 @@ Kit interface
 import os
 import re
 
-import yaml
-
 from . import log
-from . import util
 from .util import autolog
 from .kits import git, local
 
-######################
-# List of kit backends
-# a.k.a. providers
-######################
-_kit_providers = {
-    "git": git,
-    "local": local
-}
-
-# kit provider to be used
-_kit_provider = None
 
 class InvalidKitError(BaseException):
-    def __init__(self, message):
-        super().__init__("{} does not have a valid file system.".format(message))
+    """Basic Kit exception"""
 
-@autolog
-def _set_provider(provider):
-    global _kit_provider
-    _kit_provider = _kit_providers[provider]
-    log.msg_debug("Using kit provider: {}".format(provider))
+    def __init__(self, message):
+        super().__init__(
+            "{} does not have a valid file system.".format(message)
+        )
+
 
 @autolog
 def get_kit(kit_name, *, provider=None):
@@ -63,24 +48,24 @@ def get_kit(kit_name, *, provider=None):
         # test whether kit_name is a absolute directory
         if re.match("^\/", kit_name):
             log.msg_debug("Using '{}' as absolute directory".format(kit_name))
-            _set_provider("local")
+            provider = local
 
         # test whether kit_name is a relative directory
         elif os.path.isdir(os.path.join(os.getcwd(), kit_name)):
             log.msg_debug("Using '{}' as relative directory".format(kit_name))
-            _set_provider("local")
+            provider = local
 
         # see whether kit_name matches git kit criteria
-        elif re.match("^[a-zA-Z]+\/[a-zA-Z]+$", kit_name) or \
-             re.match("^http:.*\.git$", kit_name):
-            _set_provider("git")
+        elif re.match("^[a-zA-Z]+\/[a-zA-Z]+$", kit_name) \
+        or re.match("^http:.*\.git$", kit_name):
+            provider = git
 
         # when everything else fails ...
         else:
             raise InvalidKitError(kit_name)
     else:
-        _set_provider("local")
+        provider = local
         log.msg_debug("Kit provider '{}' has been imposed!".format(provider))
 
-    # Initiate kit provider
-    return _kit_provider.get_kit(kit_name)
+    # Get a Kit instance from the provider
+    return provider.get_kit(kit_name)
