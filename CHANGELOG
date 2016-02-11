@@ -1,3 +1,39 @@
+Release 0.2.0
+-------------
+* [+] New command: preview. It permits rendering only to stdout, rather than
+      writing target files specified by a kit.
+* [*] Several bug fixes
+* [+] Error and warning messages are displayed no matter what
+* [-] For the sake of preventing clutter, zenfig only works with kits, not
+      individual templates, it still uses the same variable system. Users
+      can still determine where to put their variables and how to specify them,
+      but templates are not read freely anymore, only kits.
+* [-] Template search is confined to directories inside the 'templates'
+      directory of the specified kit.
+* [+] Command-based interaction: zenfig [options] <command> <kit>
+* [+] New command 'install' tells zenfig to render all specified 'output_files'
+      from a kit into their respective destinations.
+* [+] Kit interface revamped
+    > General: kit interface gives the outside an instance of Kit which deals
+      with all things regarding information about a kit file system to be used
+      by other modules.
+    > Git: kits are treated as individual repositories under a single cache,
+    rather than just a master repo with all stuff within it.
+    > Git: kits must be specified as <user_name>/<repo_name>, this will
+    default lookup to github.
+    > Minor kit interface changes in order for new features to be fulfilled
+    > Git: kits are only updated if local copy is more than 3 days old
+    > Git: Local copies of kits must not weight more than 2 MiB
+    > Git: Entire URLs can be specified instead of default <user>/<repo>
+
+Release 0.1.1
+-------------
+
+* [FIX]: Default terminal colors were incorrect
+* [+] New default variable: term_color_background, defaults to color_base00
+* [+] New default variable: term_color_foreground, defaults to color_base07
+* [+] New default variable: term_color_cursor, defaults to color_base0A
+
 Release 0.1.0
 -------------
 * Line comments can be prefixed with '#'

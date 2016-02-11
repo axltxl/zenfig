@@ -11,9 +11,9 @@ Variables processor
 
 """
 
-import yaml
-import re
 import os
+import re
+import yaml
 
 from . import __name__ as pkg_name
 from . import log
@@ -24,6 +24,7 @@ from .util import autolog
 
 # Sanity check regex for ZF_VAR_PATH
 ZF_VAR_PATH_REGEX = "([^:]+:)*[^:]+$"
+
 
 @autolog
 def _get_vars_from_env(var_path=None):
@@ -39,6 +40,7 @@ def _get_vars_from_env(var_path=None):
         log.msg_debug("ZF_VAR_PATH has been set!")
         return var_path.split(':')
     return None
+
 
 @autolog
 def _resolve_search_path(*, user_var_files, kit_var_dir=None):
@@ -60,7 +62,7 @@ def _resolve_search_path(*, user_var_files, kit_var_dir=None):
     # Make sure we have absolute paths to
     # all variable files and/or directories
     #####################################
-    for i in range(len(user_var_files)):
+    for i, var_file in enumerate(user_var_files):
         user_var_files[i] = os.path.abspath(user_var_files[i])
 
     ################################
@@ -92,6 +94,7 @@ def _resolve_search_path(*, user_var_files, kit_var_dir=None):
 
     # Make sure there are no duplicates in this one
     return sorted(set(user_var_files), key=lambda x: user_var_files.index(x))[::-1]
+
 
 @autolog
 def _get_default_vars():
@@ -172,23 +175,28 @@ def _get_default_vars():
         # string templates.
         ####################################################
 
+        # general colors
+        "term_color_background": "{{ @color_base00 }}",
+        "term_color_foreground": "{{ @color_base07 }}",
+        "term_color_cursor": "{{ @color_base0A }}",
+
         # 16-color space
-        "term_color00": "{{ @color_base00 }}",
-        "term_color01": "{{ @color_base08 }}",
+        "term_color00": "{{ @color_base01 }}",
+        "term_color01": "{{ @color_base09 }}",
         "term_color02": "{{ @color_base0B }}",
         "term_color03": "{{ @color_base0A }}",
-        "term_color04": "{{ @color_base0D }}",
+        "term_color04": "{{ @color_base0C }}",
         "term_color05": "{{ @color_base0E }}",
         "term_color06": "{{ @color_base0C }}",
-        "term_color07": "{{ @color_base05 }}",
-        "term_color08": "{{ @color_base03 }}",
+        "term_color07": "{{ @color_base07 }}",
+        "term_color08": "{{ @color_base00 }}",
         "term_color09": "{{ @color_base08 }}",
         "term_color10": "{{ @color_base0B }}",
         "term_color11": "{{ @color_base0A }}",
         "term_color12": "{{ @color_base0D }}",
         "term_color13": "{{ @color_base0E }}",
-        "term_color14": "{{ @color_base0E }}",
-        "term_color15": "{{ @color_base07 }}",
+        "term_color14": "{{ @color_base0C }}",
+        "term_color15": "{{ @color_base06 }}",
 
         # 256-color space
         "term_color16": "{{ @color_base09 }}",
@@ -204,16 +212,18 @@ def _get_default_vars():
     # Give those variables already!
     return default_vars
 
+
 def _create_fact(facts, key, value):
     prefix = pkg_name
     facts["{}_{}".format(prefix, key)] = value
 
+
 @autolog
 def _get_facts():
     """
-    Get built-in variables
+    Get facts
 
-    Built-in variables are immutable global variables
+    Facts are immutable global variables
     set at the very end of variable resolution.
 
     :return: A dictionary with a bunch of scavenged variables
@@ -222,13 +232,14 @@ def _get_facts():
     # these are the facts
     facts = {}
 
-    _create_fact(facts, 'env', os.environ)
+    _create_fact(facts, 'env', dict(os.environ))
     _create_fact(facts, 'sys_path', os.getenv("PATH").split(":"))
     _create_fact(facts, 'user', os.getenv('USER'))
     _create_fact(facts, 'user_home', os.getenv('HOME'))
 
     # Give those variables already!
     return facts
+
 
 @autolog
 def get_user_vars(*, user_var_files, kit_var_dir):
@@ -280,8 +291,8 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     ######################################################
     # Obtain variables from variable files set by the user
     ######################################################
-    vars, locations = _get_vars(var_files=user_var_files)
-    user_vars.update(vars)
+    _vars, locations = _get_vars(var_files=user_var_files)
+    user_vars.update(_vars)
 
     # Variables whose values are strings may
     # have jinja2 logic within them as well
@@ -299,6 +310,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     # Give variables already!
     return user_vars
 
+
 @autolog
 def list_vars(*, vars, locations):
     """Print all vars given"""
@@ -314,12 +326,13 @@ def list_vars(*, vars, locations):
             for subvalue in value:
                 log.msg("    => {}".format(subvalue))
         elif isinstance(value, dict):
-            log.msg("{:24} [list] [{}]".format(key, location))
-            for k, v in value:
+            log.msg("{:24} [dict] [{}]".format(key, location))
+            for k, v in value.items():
                 log.msg("  {:24}  => {}".format(k, v))
         else:
             log.msg("{:24} = '{}' [{}]".format(key, value, location))
     log.msg("**********************************")
+
 
 @autolog
 def _get_vars(*, var_files):
@@ -376,7 +389,6 @@ def _get_vars(*, var_files):
                     )
                     log.msg_err("{}: file discarded".format(var_file))
 
-
         # The entry is a directory
         elif os.path.isdir(var_file):
 
@@ -397,4 +409,3 @@ def _get_vars(*, var_files):
 
     # Return the final result
     return tpl_vars, tpl_files
-

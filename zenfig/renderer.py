@@ -12,31 +12,33 @@ Template renderer
 """
 
 import os
-import jinja2
 import re
+import jinja2
 
 from . import log
 from . import api
-from . import util
 
-from .util import autolog, memoize
+from .util import autolog
 
 
 class InvalidTemplateDirError(BaseException):
+    """Basic exception for invalid kits"""
+
     def __init__(self, directory):
         super().__init__("main.j2 not found in {}".format(directory))
 
 # Regular expression strings used
 # for variable isolation during resolution
 # by _var_resolve
-REGEX_PATT_JINJA2   = '{{.+}}'
+REGEX_PATT_JINJA2 = '{{.+}}'
 REGEX_PATT_VARIABLE = '@[0-9A-Za-z-_]+'
-REGEX_FMT_VARIABLE  = '@{}'
+REGEX_FMT_VARIABLE = '@{}'
 REGEX_FMT_VAR_STRIP = '[@]'
 
-_re_jinja2_block = re.compile(REGEX_PATT_JINJA2)
-_re_var = re.compile(REGEX_PATT_VARIABLE)
-_re_var_strip = re.compile(REGEX_FMT_VAR_STRIP)
+REGEX_JINJA2 = re.compile(REGEX_PATT_JINJA2)
+REGEX_VAR = re.compile(REGEX_PATT_VARIABLE)
+REGEX_VAR_STRIP = re.compile(REGEX_FMT_VAR_STRIP)
+
 
 @autolog
 def _var_resolve(name, *, vars):
@@ -64,11 +66,11 @@ def _var_resolve(name, *, vars):
     # If other variables are found inside jinja2 blocks, them these are
     # firstly resolved recursively
     ##########################################################################
-    for tpl_val_jinja_blk in _re_jinja2_block.findall(tpl_value):
-        for tpl_val_var_name in _re_var.findall(tpl_val_jinja_blk):
+    for tpl_val_jinja_blk in REGEX_JINJA2.findall(tpl_value):
+        for tpl_val_var_name in REGEX_VAR.findall(tpl_val_jinja_blk):
 
             # strip surrounding chars
-            tpl_val_var_name = _re_var_strip.sub('',tpl_val_var_name)
+            tpl_val_var_name = REGEX_VAR_STRIP.sub('', tpl_val_var_name)
 
             # resolve this variable
             vars[tpl_val_var_name] = _var_resolve(tpl_val_var_name, vars=vars)
@@ -97,7 +99,7 @@ def _var_resolve(name, *, vars):
     vars[name] = tpl_value
 
     # so we can render this value
-    if _re_jinja2_block.match(vars[name]):
+    if REGEX_JINJA2.match(vars[name]):
         # Load template environment
         tpl_env = jinja2.Environment(loader=jinja2.DictLoader(vars))
 
@@ -110,6 +112,7 @@ def _var_resolve(name, *, vars):
     # At this point, this string value must be constant,
     # namely, it has no jinja2 blocks whatsoever
     return tpl_value
+
 
 @autolog
 def render_dict(vars):
@@ -129,7 +132,7 @@ def render_dict(vars):
     #############################################
     tpl_vars_keys = [
         k for k, v in vars.items()
-        if isinstance(v, str) and re.match(REGEX_PATT_JINJA2, v)
+        if isinstance(v, str) and REGEX_JINJA2.match(v)
     ]
     for tpl_name in tpl_vars_keys:
         vars[tpl_name] = _var_resolve(tpl_name, vars=vars)
@@ -137,11 +140,13 @@ def render_dict(vars):
     # Give back rendered variables
     return vars
 
+
 def _register_api(tpl_env):
     """Register custom globals and filters"""
 
     _register_api_globals(tpl_env)
     _register_api_filters(tpl_env)
+
 
 @autolog
 def _register_api_globals(tpl_env):
@@ -150,6 +155,7 @@ def _register_api_globals(tpl_env):
     for api_global_name, api_global_func in api.get_globals().items():
         tpl_env.globals[api_global_name] = api_global_func
 
+
 @autolog
 def _register_api_filters(tpl_env):
     """Register all filters"""
@@ -157,61 +163,34 @@ def _register_api_filters(tpl_env):
     for api_filter_name, api_filter_func in api.get_filters().items():
         tpl_env.filters[api_filter_name] = api_filter_func
 
+
 @autolog
-def render_file(*, vars, template_file, output_file):
+def render_file(*, vars, template_file, output_file, template_include_dirs):
     """
     Render a jinja2 template
 
-    :param vars: a dictionary containing all variables to be injected into the template
+    :param vars:
+        a dictionary containing all variables to be injected into the template
     :param template_file: path to the template file
     :param output_file: path to resulting output file
+    :param template_include_dirs: template include directories
     """
-
-    # Make sure we have the absolute path to the template file
-    template_file = os.path.abspath(template_file)
-
-    ##############################################
-    # A directory instead of a single file can
-    # be specified. In this case, zenfig will
-    # look for a file named main.j2 inside that
-    # directory
-    ##############################################
-    if os.path.isdir(template_file):
-        template_file = "{}/main.j2".format(template_file)
-        log.msg_warn("You have specified a template directory")
-        log.msg_warn("I'm gonna look for {}".format(template_file))
-
-        if os.path.isfile(template_file):
-            log.msg_warn("{} found!".format(template_file))
-        else:
-            raise InvalidTemplateDirError(os.path.dirname(template_file))
 
     ####################################################
     # zenfig will look for templates on this directories
     ####################################################
 
-    # XDG_DATA_HOME/zenfig/templates is inside
-    # the template search path
-    xdg_template_directory = "{}/templates".format(
-        util.get_xdg_data_home()
-    )
-
-    # Construct the actual search path
-    tpl_searchpath = [
-            os.getcwd(), # relative to current working directory
-            os.path.dirname(template_file),  # relative to template's directory
-            xdg_template_directory,
-            '/',  # absolute paths
-            ]
-
     # There are cases in which duplicate entries
     # inside the template search path could actually exist,
     # e.g. cwd and template directory are the same
-    tpl_searchpath = sorted(set(tpl_searchpath), key=lambda x: tpl_searchpath.index(x))
+    template_include_dirs = sorted(
+        set(template_include_dirs),
+        key=lambda x: template_include_dirs.index(x)
+    )
 
     log.msg_debug("Template search path:")
     log.msg_debug("*********************")
-    for search_path in tpl_searchpath:
+    for search_path in template_include_dirs:
         log.msg_debug(search_path)
     log.msg_debug("*********************")
 
@@ -219,15 +198,12 @@ def render_file(*, vars, template_file, output_file):
     # load template environment
     ###########################
     tpl_env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(tpl_searchpath),
+        loader=jinja2.FileSystemLoader(template_include_dirs),
         trim_blocks=True,
         keep_trailing_newline=True,
         line_comment_prefix="#",
         line_statement_prefix="%",
     )
-
-    # set user's environment variables inside globals
-    tpl_env.globals['env'] = os.environ
 
     ############################
     # register all API functions
@@ -248,5 +224,5 @@ def render_file(*, vars, template_file, output_file):
     else:
         output_file = os.path.abspath(output_file)
         log.msg("Writing to '{}'".format(output_file), bold=True)
-        with open(output_file, 'w') as of:
-            of.write(rendered_str)
+        with open(output_file, 'w') as ofile:
+            ofile.write(rendered_str)
