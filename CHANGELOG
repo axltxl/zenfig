@@ -1,3 +1,10 @@
+Release 0.2.2
+-------------
+
+* [+] XDG_DATA_HOME/templates is also added to the template search path:
+      This is mostly because there are kits that offer the user to include
+      his own custom templates as means of customization and expansion
+
 Release 0.2.1
 -------------
 
