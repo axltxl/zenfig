@@ -14,10 +14,8 @@ import os
 
 from . import Kit
 
-from .. import log
-from .. import util
-
 from ..util import autolog
+
 
 @autolog
 def get_kit(kit_name):
