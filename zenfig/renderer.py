@@ -17,6 +17,7 @@ import jinja2
 
 from . import log
 from . import api
+from . import util
 
 from .util import autolog
 
@@ -107,7 +108,7 @@ def _var_resolve(name, *, vars):
         _register_api(tpl_env)
 
         # Render and deliver, finally!
-        return tpl_env.get_template(name).render(vars)
+        return util.str2whatever(tpl_env.get_template(name).render(vars))
 
     # At this point, this string value must be constant,
     # namely, it has no jinja2 blocks whatsoever

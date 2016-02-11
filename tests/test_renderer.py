@@ -55,3 +55,31 @@ def test_renderer_render_dict():
     }
     r = renderer.render_dict(var_dict_with_filters_third_degree)
     eq_("#1a1a1a", r['message'])
+
+def test_type_consistency():
+    # int
+    var_int = {
+        'value': '{{ @int_value }}',
+        'int_value': 5
+    }
+    r = renderer.render_dict(var_int)
+    eq_(isinstance(r['value'], int), True)
+    eq_(5, r['value'])
+
+    # bool
+    var_bool = {
+        'value': '{{ @bool_value }}',
+        'bool_value': False
+    }
+    r = renderer.render_dict(var_bool)
+    eq_(isinstance(r['value'], bool), True)
+    eq_(False, r['value'])
+
+    # float
+    var_float = {
+        'value': '{{ @float_value }}',
+        'float_value': 0.14
+    }
+    r = renderer.render_dict(var_float)
+    eq_(isinstance(r['value'], float), True)
+    eq_(0.14, r['value'])
