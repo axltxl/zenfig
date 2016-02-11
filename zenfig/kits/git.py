@@ -123,10 +123,14 @@ def _cache_isvalid(kit_name):
 
     # is it taking too much of your hard drive?
     # kit_cache_size = os.path.getsize(KIT_CACHE_HOME)
-    kit_cache_size = sum([os.path.getsize(f) for f in os.listdir(git_repo_path) if os.path.isfile(f)])
+    kit_cache_size = sum([
+        os.path.getsize(f) for f in os.listdir(git_repo_path)
+        if os.path.isfile(f)
+    ])
     log.msg_debug("Kit cache size: {:.2f} MiB".format(kit_cache_size/1024))
     if kit_cache_size > KIT_CACHE_MAX_SIZE:
-        log.msg_warn("Kit cache is taking more "\
+        log.msg_warn(
+            "Kit cache is taking more "
             "space than it should ({})".format(kit_cache_size))
         return False
 
