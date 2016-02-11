@@ -132,7 +132,7 @@ def render_dict(vars):
     #############################################
     tpl_vars_keys = [
         k for k, v in vars.items()
-        if isinstance(v, str) and re.match(REGEX_PATT_JINJA2, v)
+        if isinstance(v, str) and REGEX_JINJA2.match(v)
     ]
     for tpl_name in tpl_vars_keys:
         vars[tpl_name] = _var_resolve(tpl_name, vars=vars)
