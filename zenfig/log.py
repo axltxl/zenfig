@@ -6,7 +6,7 @@ zenfig.log
 
 Nice output
 
-:copyright: (c) 2015 by Alejandro Ricoveri
+:copyright: (c) 2016 by Alejandro Ricoveri
 :license: MIT, see LICENSE for more details.
 """
 
@@ -33,8 +33,8 @@ def init(*, quiet_stdout=True):
         _stdout = True
 
 
-def to_stdout(msg, *, colorf=green, bold=False):
-    if _stdout:
+def to_stdout(msg, *, colorf=green, bold=False, quiet=True):
+    if not quiet or _stdout:
         print(colorf(msg, bold=bold), file=sys.stderr)
 
 
@@ -55,7 +55,7 @@ def msg_warn(message):
     :param message: the message to be logged
     """
     to_stdout(" (!) {message}".format(message=message),
-              colorf=yellow, bold=True)
+              colorf=yellow, bold=True, quiet=False)
 
 
 def msg_err(message):
@@ -64,7 +64,8 @@ def msg_err(message):
 
     :param message: the message to be logged
     """
-    to_stdout(" !!! {message}".format(message=message), colorf=red, bold=True)
+    to_stdout(" !!! {message}".format(message=message),
+            colorf=red, bold=True, quiet=False)
 
 
 def msg_debug(message):

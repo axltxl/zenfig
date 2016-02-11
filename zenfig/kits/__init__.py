@@ -6,7 +6,7 @@ zenfig.kits
 
 Some message
 
-:copyright: (c) 2015 by Alejandro Ricoveri
+:copyright: (c) 2016 by Alejandro Ricoveri
 :license: MIT, see LICENSE for more details.
 
 """
@@ -16,6 +16,14 @@ import yaml
 from voluptuous import Schema, Optional
 
 from ..util import autolog
+
+class InvalidKitError(BaseException):
+    """Basic Kit exception"""
+
+    def __init__(self, message):
+        super().__init__(
+            "{} does not have a valid file system.".format(message)
+        )
 
 class Kit:
     """
@@ -104,11 +112,10 @@ class Kit:
             #     must be relative to the user home directory.
             ########################################
             'templates': dict,  # TODO: temporary
-        },
-        required=True)
+        }, required=True)
 
         # Attempt to open the index file:
-        with open(self._index_file,'r') as file:
+        with open(self._index_file, 'r') as file:
             self._index_data = schema(yaml.load(file))
 
         ###################################################

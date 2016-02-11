@@ -26,8 +26,9 @@ from zenfig import PKG_URL as pkg_url
 from zenfig import __name__ as pkg_name, __version__ as pkg_version
 from zenfig import kit
 
+
 def parse_args(argv):
-    """Usage: zenfig [-v]... [-I <varfile>]... (install) <kit>
+    """Usage: zenfig [-v]... [-I <varfile>]... (install|preview) <kit>
 
     -I <varfile>, --include <varfile>  Variables file/directory to include
     -v  Output verbosity
@@ -81,9 +82,6 @@ def start(*, options):
     # Initialise kit interface
     _kit = kit.get_kit(kit_name)
 
-    # mark the thing
-    log.msg_warn("Found kit: {}".format(kit_name))
-
     ####################
     # Get user variables
     ####################
@@ -92,12 +90,22 @@ def start(*, options):
         kit_var_dir=_kit.var_dir
     )
 
-    for template, template_data in _kit.templates.items():
+    for template_data in _kit.templates.values():
 
         # Obtain basic information from the kit
-        output_file = template_data['output_file']
         template_file = template_data['path']
         template_include_dirs = template_data['include']
+
+        # Depending on command set, the file would be either
+        # displayed on screen or written onto a file
+        if not options['preview']:
+            output_file = template_data['output_file']
+        else:
+            log.msg_warn('Previewing file: {}'.format(
+                template_data['output_file']
+            ))
+            log.msg_warn('---')
+            output_file = None
 
         #######################
         # Render that template!
@@ -109,8 +117,13 @@ def start(*, options):
             output_file=output_file,
         )
 
+        # Mark the end of previewed file
+        if options['preview']:
+            log.msg_warn('---')
+
     # Measure execution time
     log.msg("Done! ({:.3f} ms)".format((time.time() - start_time)*1000))
+
 
 def _handle_except(e):
     """
@@ -127,6 +140,7 @@ def _handle_except(e):
     log.msg_err("An error has occurred!. "
                 "For more details, review the logs.")
     return 1
+
 
 def main(argv=None):
     """

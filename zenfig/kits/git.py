@@ -28,7 +28,7 @@ from ..util import autolog
 # Essential git repo variables
 GIT_REPO_PREFIX_DEFAULT = "https://github.com"
 GIT_BRANCH = "master"
-GIT_REF  = "refs/heads/{}".format(GIT_BRANCH)
+GIT_REF = "refs/heads/{}".format(GIT_BRANCH)
 
 # Kit cache location
 KIT_CACHE_HOME = "{}/kits".format(util.get_xdg_cache_home())
@@ -36,6 +36,7 @@ KIT_CACHE_HOME = "{}/kits".format(util.get_xdg_cache_home())
 # Kit cache maximum allowed size
 KIT_CACHE_MAX_SIZE = 2048  # 2 megs
 KIT_CACHE_MAX_TIME = 259200  # 3 days
+
 
 @autolog
 def _cache_create(kit_name):
@@ -91,6 +92,7 @@ def _cache_create(kit_name):
     # give back the cloned git repository
     return git_repo
 
+
 @autolog
 def _clone_repo(git_repo_remote, git_repo_path):
     log.msg_warn("Cloning kit repository: {}".format(git_repo_remote))
@@ -100,6 +102,7 @@ def _clone_repo(git_repo_remote, git_repo_path):
         depth=1,
         branch=GIT_BRANCH
     )
+
 
 @autolog
 def _cache_isvalid(kit_name):
@@ -120,15 +123,20 @@ def _cache_isvalid(kit_name):
 
     # is it taking too much of your hard drive?
     # kit_cache_size = os.path.getsize(KIT_CACHE_HOME)
-    kit_cache_size = sum([os.path.getsize(f) for f in os.listdir(git_repo_path) if os.path.isfile(f)])
+    kit_cache_size = sum([
+        os.path.getsize(f) for f in os.listdir(git_repo_path)
+        if os.path.isfile(f)
+    ])
     log.msg_debug("Kit cache size: {:.2f} MiB".format(kit_cache_size/1024))
     if kit_cache_size > KIT_CACHE_MAX_SIZE:
-        log.msg_warn("Kit cache is taking more "\
+        log.msg_warn(
+            "Kit cache is taking more "
             "space than it should ({})".format(kit_cache_size))
         return False
 
     # OK, it's good to go!
     return True
+
 
 @autolog
 def _cache_is_too_old(kit_name):
@@ -141,6 +149,7 @@ def _cache_is_too_old(kit_name):
     return os.path.getmtime(
         _get_kit_dir(kit_name)) < (time() - KIT_CACHE_MAX_TIME
     )
+
 
 @autolog
 def _cache_update(kit_name):
@@ -192,6 +201,7 @@ def _cache_update(kit_name):
 @autolog
 def _get_kit_dir(kit_name):
     return "{}/{}".format(KIT_CACHE_HOME, kit_name)
+
 
 @autolog
 def get_kit(kit_name):

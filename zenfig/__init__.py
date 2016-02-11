@@ -6,7 +6,7 @@ zenfig
 
 The very basics
 
-:copyright: (c) 2015 by Alejandro Ricoveri
+:copyright: (c) 2016 by Alejandro Ricoveri
 :license: MIT, see LICENSE for more details.
 
 """
@@ -14,6 +14,6 @@ The very basics
 PKG_URL = 'https://github.com/axltxl/zenfig'
 __name__ = 'zenfig'
 __author__ = 'Alejandro Ricoveri'
-__version__ = '0.1'
+__version__ = '0.2.0'
 __licence__ = 'MIT'
 __copyright__ = 'Copyright (c) Alejandro Ricoveri'

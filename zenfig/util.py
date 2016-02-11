@@ -11,17 +11,16 @@ Utilities
 
 """
 import os
-import inspect
-
 from functools import wraps
 from time import time
 
 from . import log
 from . import __name__ as pkg_name
 
+
 def memoize(func):
     """
-    A simple memcache decorator
+    A simple memoizer decorator
     """
     # Cache as dict, all entries go in here
     cache = {}
@@ -39,7 +38,7 @@ def memoize(func):
     # give that wrapper
     return _wrapper
 
-# Based on: http://stackoverflow.com/questions/10973362/python-logging-function-name-file-name-line-number-using-a-single-file
+
 def autolog(func):
     """
     Decorator for automatically log the current function details.
@@ -50,15 +49,18 @@ def autolog(func):
     def _log_wrapper(*args, **kwargs):
         # measure its execution time
         start_time = time()
-        r = func(*args, **kwargs)
-        dt = time() - start_time
+        res = func(*args, **kwargs)
+        end_time = time()
 
         # Dump the message + the name of this function to the log.
-        log.msg_debug("{} {:.3f} ms".format(func.__name__, dt*1000))
+        log.msg_debug("{} (t = {:.3f} ms)".format(
+           func.__name__, (end_time - start_time)*1000)
+        )
 
         # return whatever func has thrown
-        return r
+        return res
     return _log_wrapper
+
 
 @autolog
 def get_xdg_cache_home():
@@ -71,6 +73,7 @@ def get_xdg_cache_home():
         xdg_cache_home = "{}/.cache/{}".format(os.getenv("HOME"), pkg_name)
     return xdg_cache_home
 
+
 @autolog
 def get_xdg_data_home():
     """Get XDG_DATA_HOME"""
@@ -79,7 +82,7 @@ def get_xdg_data_home():
     # the template search path
     xdg_data_home = os.getenv('XDG_DATA_HOME')
     if xdg_data_home is None:
-        xdg_data_home = "{}/.local/share/{}".format(os.getenv("HOME"), pkg_name)
+        xdg_data_home = "{}/.local/share/{}".format(
+            os.getenv("HOME"), pkg_name
+        )
     return xdg_data_home
-
-

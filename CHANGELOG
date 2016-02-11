@@ -1,5 +1,9 @@
 Release 0.2.0
 -------------
+* [+] New command: preview. It permits rendering only to stdout, rather than
+      writing target files specified by a kit.
+* [*] Several bug fixes
+* [+] Error and warning messages are displayed no matter what
 * [-] For the sake of preventing clutter, zenfig only works with kits, not
       individual templates, it still uses the same variable system. Users
       can still determine where to put their variables and how to specify them,
