@@ -15,7 +15,9 @@ import os
 import yaml
 from voluptuous import Schema, Optional
 
+from . import InvalidKitError
 from ..util import autolog
+
 
 class Kit:
     """
@@ -104,11 +106,10 @@ class Kit:
             #     must be relative to the user home directory.
             ########################################
             'templates': dict,  # TODO: temporary
-        },
-        required=True)
+        }, required=True)
 
         # Attempt to open the index file:
-        with open(self._index_file,'r') as file:
+        with open(self._index_file, 'r') as file:
             self._index_data = schema(yaml.load(file))
 
         ###################################################
