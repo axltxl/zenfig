@@ -1,3 +1,8 @@
+Release 0.2.1
+-------------
+
+* [FIX] Types from resolved values are consistent
+
 Release 0.2.0
 -------------
 * [+] New command: preview. It permits rendering only to stdout, rather than
