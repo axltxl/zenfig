@@ -14,6 +14,6 @@ The very basics
 PKG_URL = 'https://github.com/axltxl/zenfig'
 __name__ = 'zenfig'
 __author__ = 'Alejandro Ricoveri'
-__version__ = '0.2.3'
+__version__ = '0.2.5'
 __licence__ = 'MIT'
 __copyright__ = 'Copyright (c) Alejandro Ricoveri'
