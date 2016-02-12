@@ -19,6 +19,10 @@ from .util import autolog
 from .kits import git, local, InvalidKitError
 
 
+# Regular expression for catching git repositories
+RE_GIT_REPO_SHORT = "^[a-zA-Z0-9\-_]+\/[a-zA-Z0-9\-_]+$"
+RE_GIT_REPO_URL = "^http.*\.git$"
+
 @autolog
 def get_kit(kit_name, *, provider=None):
     """
@@ -47,8 +51,8 @@ def get_kit(kit_name, *, provider=None):
             provider = local
 
         # see whether kit_name matches git kit criteria
-        elif re.match("^[a-zA-Z]+\/[a-zA-Z]+$", kit_name) \
-        or re.match("^http:.*\.git$", kit_name):
+        elif re.match(RE_GIT_REPO_SHORT, kit_name) \
+        or re.match(RE_GIT_REPO_URL, kit_name):
             provider = git
 
         # when everything else fails ...

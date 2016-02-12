@@ -1,3 +1,8 @@
+Release 0.2.5
+-------------
+
+* [FIX] Regular expressions for git repositories were wrong
+
 Release 0.2.3
 -------------
 
