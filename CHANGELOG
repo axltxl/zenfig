@@ -1,3 +1,9 @@
+Release 0.2.3
+-------------
+
+* [-] Variable resolution fallback. All resolved variables are ultimately
+      strings.
+
 Release 0.2.2
 -------------
 
