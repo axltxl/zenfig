@@ -86,23 +86,3 @@ def get_xdg_data_home():
             os.getenv("HOME"), pkg_name
         )
     return xdg_data_home
-
-@autolog
-@memoize
-def str2whatever(value):
-    """
-    Convert a string value onto its correspondent type
-    :value: A string value
-    """
-    if not isinstance(value,str):
-        return None
-
-    # The eval approach does the job in a much less
-    # complicated way, no regexes, no ifs, etc.
-    try:
-        return eval(value)
-    except:
-        pass
-
-    # give the thing back!
-    return value
