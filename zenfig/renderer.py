@@ -20,6 +20,8 @@ from . import api
 from . import util
 
 from .util import autolog
+from .depgraph.depgraph import DepGraph
+from .depgraph.node import Node
 
 
 class InvalidTemplateDirError(BaseException):
@@ -42,120 +44,121 @@ REGEX_VAR = re.compile(REGEX_PATT_VAR)
 REGEX_VAR_STRIP = re.compile(REGEX_FMT_VAR_STRIP)
 
 
-@autolog
-def _var_strip(
-    vars,
-    name,
-    tpl_val_jinja_blk,
-    tpl_value,
-    *,
-    regex_var,
-    regex_var_strip,
-    regex_fmt_var
-):
-    """
-    Variable substitution
+class VarNode(Node):
+    """Variable node implementation"""
 
-    Tokenize variables from a jinja2 block and substitute them
-    with their resolved variables.
+    def calc_deps(self, value=None):
+        """
+        Calculate dependencies for this node
 
-    :param vars: A list of all variables to be used
-    :param tpl_var_jinja_blk: A jinja2 block string
-    :param tpl_value: Value of the variable 'name'
-    :param name: Name of the whose value is going to be resolved
-    :param regex_var: Regular expression for variable tokenization
-    :param regex_var_strip: Regular expression for variable stripping
-    :param regex_fmt_var: String format for variable reinsertion into tpl_val_jinja_blk
-    :returns: A jinja2 string with all inner variables resolved
-    """
+        :param value: value to be evaluated for dependencies
+        """
 
-    for tpl_val_var_name in regex_var.findall(tpl_val_jinja_blk):
+        # All collected dependencies' keys will go in here
+        deps = []
 
-        # strip surrounding chars
-        tpl_val_var_name = regex_var_strip.sub('', tpl_val_var_name)
+        # Since this method is recursive, it is capable of evaluating
+        # as deep as value goes, meaning that it can check dictionaries
+        # and lists for any references of dependencies. At first, this
+        # value is this node's value itself, if required, this method
+        # is recursively called until all dependencies have been collected.
+        if value is None:
+            value = self.value
 
-        # resolve this variable
-        vars[tpl_val_var_name] = _var_resolve(tpl_val_var_name, vars=vars)
+        # Only strings are actually checked for dependencies
+        if isinstance(value, str):
+            # References to @variables within {{ jinja blocks }} are
+            # considered by this node as references to dependencies.
+            # They are isolated and collected.
+            for jinja_blk in REGEX_JINJA2.findall(value):
+                for var_name in REGEX_VAR.findall(value):
+                    deps.append(REGEX_VAR_STRIP.sub('', var_name))
 
-        # Once tpl_val_var_name, has been resolved
-        # then proceed to actual value substitution
-        # on tpl_value (which is the resulting value from resolution)
-        if isinstance(vars[name], str):
-            var_fmt = '"{}"'
-        else:
-            var_fmt = ''
+        # dict found?, its values are checked as well for any dependencies
+        elif isinstance(value, dict):
+            for dval in value.values():
+                deps.extend(self.calc_deps(dval))
 
-        # Variable reinsertion into tpl_value
-        # Each resolved variable that was inside each jinja2 block
-        # is replaced with its resolved value
-        tpl_value = re.sub(
-            regex_fmt_var.format(tpl_val_var_name),
-            var_fmt.format(vars[tpl_val_var_name]),
-            tpl_value
-        )
+        # list found?, its values are checked one by one to see whether
+        # there are any references to dependencies.
+        elif isinstance(value, list):
+            for lval in value:
+                deps.extend(self.calc_deps(lval))
 
-    # give the thing back!
-    return tpl_value
+        # All scavenged dependencies are returned
+        return deps
 
+    @staticmethod
+    def _render(value, deps):
+        """
+        Render a string through jinja2
 
-@autolog
-def _var_resolve(name, *, vars):
-    """
-    Resolve a variable
+        :param value: value to be rendered
+        :param deps: a list of variables to be applied upon rendering
+        :returns: A jinja2-rendered string
+        """
+        tpl = {'@': value}
 
-    Deduct the value of a variable in vars
-
-    :param name: the needle
-    :param vars: the haze
-    """
-
-    # Only strings are resolved
-    if not isinstance(vars[name], str):
-        return vars[name]
-
-    # We begin by getting current string value
-    # held by this var
-    tpl_value = vars[name]
-
-    ##########################################################################
-    # Variable recursive resolution:
-    # ------------------------------
-    # Variables must be inside jinja2 blocks in order for them to be resolved.
-    # If other variables are found inside jinja2 blocks, them these are
-    # firstly resolved recursively
-    ##########################################################################
-    for tpl_val_jinja_blk in REGEX_JINJA2.findall(tpl_value):
-        # Resolve each variable inside each jinja2 block
-        tpl_value = _var_strip(
-            vars, name, tpl_val_jinja_blk, tpl_value,
-            regex_var=REGEX_VAR, regex_var_strip=REGEX_VAR_STRIP,
-            regex_fmt_var=REGEX_FMT_VAR
-        )
-
-    #############################################################
-    # At this point, all dependent variables have been resolved
-    # However, they are still jinja2 blocks
-    # Meaning, we have to deliver them to jinja2 in order to have
-    # a full resolved value
-    #############################################################
-
-    # Reasign tpl_value to current var to be rendered
-    vars[name] = tpl_value
-
-    # so we can render this value
-    if REGEX_JINJA2.match(vars[name]):
+        tpl_vars = {}
+        for dep_name, dep_node in deps.items():
+            tpl_vars[dep_name] = dep_node.value
+        # so we can render this value
         # Load template environment
-        tpl_env = jinja2.Environment(loader=jinja2.DictLoader(vars))
+        tpl_env = jinja2.Environment(loader=jinja2.DictLoader(tpl))
 
         # Register all globals and filters
         _register_api(tpl_env)
 
         # Render and deliver, finally!
-        return tpl_env.get_template(name).render(vars)
+        return tpl_env.get_template('@').render(tpl_vars)
 
-    # At this point, this string value must be constant,
-    # namely, it has no jinja2 blocks whatsoever
-    return tpl_value
+    def on_evaluate(self, value=None):
+        """Evaluate this node"""
+
+        # no point if there are no dependencies whatsoever.
+        if not len(self.deps):
+            return
+
+        # Bootstrap this thing with its first value
+        if value is None:
+            self.value = self.on_evaluate(self.value)
+
+        # Each string found will be treated with already evaluated
+        # dependencies values
+        if isinstance(value, str):
+
+            # Each dependency replaces its references within this node's value
+            for dep_name, dep_node in self.deps.items():
+
+                # Actual value substitution
+                # on node's.value (which is the resulting
+                # value from resolution)
+                if isinstance(dep_node.value, str):
+                    var_fmt = '"{}"'
+                else:
+                    var_fmt = '{}'
+
+                var_pattern = REGEX_FMT_VAR.format(dep_name)
+                var_repl = var_fmt.format(dep_node.value)
+                value = re.sub(var_pattern, var_repl, value)
+
+            # Once all dependencies have been put in place
+            # time to render
+            return self._render(value, self.deps)
+
+        # Check for each element in this dict and evaluate it accordingly
+        elif isinstance(value, dict):
+            for dkey, dval in value.items():
+                value[dkey] = self.on_evaluate(dval)
+
+        # Check for each element in the list and evaluate it accordingly
+        elif isinstance(value, list):
+            for i, lval in enumerate(value):
+                value[i] = self.on_evaluate(lval)
+
+        # At this point, whichever value it was being evaluated, it
+        # got evaluated, so ...
+        return value
 
 
 @autolog
@@ -174,15 +177,8 @@ def render_dict(vars):
     # logic as well, thus, variables in YAML can
     # reference other variables
     #############################################
-    tpl_vars_keys = [
-        k for k, v in vars.items()
-        if isinstance(v, str) and REGEX_JINJA2.match(v)
-    ]
-    for tpl_name in tpl_vars_keys:
-        vars[tpl_name] = _var_resolve(tpl_name, vars=vars)
 
-    # Give back rendered variables
-    return vars
+    return DepGraph(node_class=VarNode, **vars).evaluate()
 
 
 def _register_api(tpl_env):

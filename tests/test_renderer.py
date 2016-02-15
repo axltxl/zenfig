@@ -34,7 +34,8 @@ def test_renderer_render_dict():
     #####################################
     var_dict_with_filters_simple = {
         "color_hex": "{{ @color|norm_hex }}",
-        "color": "1a1a1a"
+        "color": "1a1a1a",
+        "somenum": 1
     }
     r = renderer.render_dict(var_dict_with_filters_simple)
     eq_("#1a1a1a", r['color_hex'])
@@ -42,7 +43,8 @@ def test_renderer_render_dict():
     var_dict_with_filters_second_degree = {
         "message": "{{ @another_color }}",
         "another_color": "{{ @color|norm_hex }}",
-        "color": "1a1a1a"
+        "color": "1a1a1a",
+        "somenum": 1
     }
     r = renderer.render_dict(var_dict_with_filters_second_degree)
     eq_("#1a1a1a", r['message'])
@@ -51,7 +53,29 @@ def test_renderer_render_dict():
         "message": "{{ @another_color }}",
         "another_color": "{{ @color|norm_hex }}",
         "base_color": "1a1a1a",
-        "color": "{{ @base_color }}"
+        "color": "{{ @base_color }}",
+        "somenum": 1
     }
     r = renderer.render_dict(var_dict_with_filters_third_degree)
     eq_("#1a1a1a", r['message'])
+
+    var_with_dict = {
+        "hello": "world",
+        "iamdict": {
+            "hi": "{{ @hello }}",
+            "there": 1,
+            "somebol": True
+        }
+    }
+    r = renderer.render_dict(var_with_dict)
+    eq_("world", r['iamdict']['hi'])
+
+    var_with_list = {
+        "hello": "world",
+        "iamlist": [
+            "{{ @hello }}",
+            1, 2, True
+        ]
+    }
+    r = renderer.render_dict(var_with_list)
+    eq_("world", r['iamlist'][0])
