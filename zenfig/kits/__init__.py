@@ -167,6 +167,14 @@ class Kit:
         self._var_dirs = os.path.join(self._root_dir, 'defaults')
 
     @property
+    def index_data(self):
+        return self._index_data
+
+    @property
+    def index_file(self):
+        return self._index_file
+
+    @property
     def root_dir(self):
         """Kit base directory"""
         return self._root_dir

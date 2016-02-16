@@ -214,19 +214,21 @@ def _get_default_vars():
     return default_vars
 
 
-def _create_fact(facts, key, value):
-    prefix = pkg_name
+def _create_fact(facts, key, value, *, prefix=None):
+    if prefix is None:
+        prefix = pkg_name
     facts["{}_{}".format(prefix, key)] = value
 
 
 @autolog
-def _get_facts():
+def _get_facts(*, kit):
     """
     Get facts
 
     Facts are immutable global variables
     set at the very end of variable resolution.
 
+    :param kit: A kit from which facts are going to be extracted
     :return: A dictionary with a bunch of scavenged variables
     """
 
@@ -239,12 +241,20 @@ def _get_facts():
     _create_fact(facts, 'user_home', os.getenv('HOME'))
     _create_fact(facts, 'version', pkg_version)
 
+    # Kit index variables are taken as well as facts
+    # so they can be referenced by other variables, also
+    # this means that index variables from a kit can reference
+    # other variables as well, because all this variables get
+    # rendered as part of variable resolution.
+    for key, value in kit.index_data.items():
+        _create_fact(facts, key, value, prefix="{}_{}".format(pkg_name, "kit"))
+
     # Give those variables already!
     return facts
 
 
 @autolog
-def get_user_vars(*, user_var_files, kit_var_dir):
+def get_user_vars(*, user_var_files, kit):
     """
     Resolve variables from user environment
 
@@ -255,7 +265,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     ultimately search paths set by the user.
 
     :param user_var_files: Variable search paths set by the user
-    :param kit_var_dir: Kit search path
+    :param kit: Kit to be sourced
     """
 
     #######################################################
@@ -272,7 +282,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     ##########################
     user_var_files = _resolve_search_path(
         user_var_files=user_var_files,
-        kit_var_dir=kit_var_dir
+        kit_var_dir=kit.var_dir
     )
     log.msg_debug("Variables search path:")
     log.msg_debug("**********************")
@@ -283,7 +293,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     ########################################
     # Set facts
     ########################################
-    facts = _get_facts()
+    facts = _get_facts(kit=kit)
     fact_locations = {}
     for fact in facts.keys():
         fact_locations[fact] = 'fact'
