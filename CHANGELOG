@@ -1,3 +1,10 @@
+Release 0.3.0
+-------------
+
+* [+] Renderer variable resolution revamped: New DepGraph system allows not
+      only string variables to be evaluated but also strings found within
+      dict and list variables found all across variable search paths.
+
 Release 0.2.5
 -------------
 
