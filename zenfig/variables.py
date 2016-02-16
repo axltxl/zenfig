@@ -16,6 +16,7 @@ import re
 import yaml
 
 from . import __name__ as pkg_name
+from . import __version__ as pkg_version
 from . import log
 from . import util
 from . import renderer
@@ -236,6 +237,7 @@ def _get_facts():
     _create_fact(facts, 'sys_path', os.getenv("PATH").split(":"))
     _create_fact(facts, 'user', os.getenv('USER'))
     _create_fact(facts, 'user_home', os.getenv('HOME'))
+    _create_fact(facts, 'version', pkg_version)
 
     # Give those variables already!
     return facts

@@ -1,6 +1,7 @@
 Release 0.3.0
 -------------
 
+* [+] New fact: zenfig_version
 * [+] Renderer variable resolution revamped: New DepGraph system allows not
       only string variables to be evaluated but also strings found within
       dict and list variables found all across variable search paths.
