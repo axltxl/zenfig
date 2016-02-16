@@ -13,7 +13,9 @@ Node implementation
 
 
 class Node:
-    """Graph node implementation"""
+    """
+    Graph node implementation
+    """
 
     def __init__(self, key, value, *, depgraph):
         """

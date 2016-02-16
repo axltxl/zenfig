@@ -58,7 +58,7 @@ class VarNode(Node):
         deps = []
 
         # Since this method is recursive, it is capable of evaluating
-        # as deep as value goes, meaning that it can check dictionaries
+        # as deep as the value goes, meaning that it can check dictionaries
         # and lists for any references of dependencies. At first, this
         # value is this node's value itself, if required, this method
         # is recursively called until all dependencies have been collected.
