@@ -244,7 +244,7 @@ def _get_facts(*, kit):
     # Kit index variables are taken as well as facts
     # so they can be referenced by other variables, also
     # this means that index variables from a kit can reference
-    # other variables as well, because all this variables get
+    # other variables as well, because all these variables get
     # rendered as part of variable resolution.
     for key, value in kit.index_data.items():
         _create_fact(facts, key, value, prefix="{}_{}".format(pkg_name, "kit"))
