@@ -17,7 +17,7 @@ def test_renderer_render_dict():
         "hello": "Hello",
         "world": "world!"
     }
-    r = renderer.render_dict(var_dict_simple)
+    r = renderer.render_dict(**var_dict_simple)
     eq_(r['message'], "Hello world!")
 
     var_dict_second_degree = {
@@ -25,7 +25,7 @@ def test_renderer_render_dict():
         "marco": "{{ @polo }}",
         "polo": "Polo!"
     }
-    r = renderer.render_dict(var_dict_second_degree)
+    r = renderer.render_dict(**var_dict_second_degree)
     eq_("Polo!", r['marco'])
     eq_("Polo!", r['message'])
 
@@ -37,7 +37,7 @@ def test_renderer_render_dict():
         "color": "1a1a1a",
         "somenum": 1
     }
-    r = renderer.render_dict(var_dict_with_filters_simple)
+    r = renderer.render_dict(**var_dict_with_filters_simple)
     eq_("#1a1a1a", r['color_hex'])
 
     var_dict_with_filters_second_degree = {
@@ -46,7 +46,7 @@ def test_renderer_render_dict():
         "color": "1a1a1a",
         "somenum": 1
     }
-    r = renderer.render_dict(var_dict_with_filters_second_degree)
+    r = renderer.render_dict(**var_dict_with_filters_second_degree)
     eq_("#1a1a1a", r['message'])
 
     var_dict_with_filters_third_degree = {
@@ -56,7 +56,7 @@ def test_renderer_render_dict():
         "color": "{{ @base_color }}",
         "somenum": 1
     }
-    r = renderer.render_dict(var_dict_with_filters_third_degree)
+    r = renderer.render_dict(**var_dict_with_filters_third_degree)
     eq_("#1a1a1a", r['message'])
 
     var_with_dict = {
@@ -67,7 +67,7 @@ def test_renderer_render_dict():
             "somebol": True
         }
     }
-    r = renderer.render_dict(var_with_dict)
+    r = renderer.render_dict(**var_with_dict)
     eq_("world", r['iamdict']['hi'])
 
     var_with_list = {
@@ -77,5 +77,5 @@ def test_renderer_render_dict():
             1, 2, True
         ]
     }
-    r = renderer.render_dict(var_with_list)
+    r = renderer.render_dict(**var_with_list)
     eq_("world", r['iamlist'][0])

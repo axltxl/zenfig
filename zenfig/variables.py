@@ -299,7 +299,7 @@ def get_user_vars(*, user_var_files, kit_var_dir):
     # so we render those values through jinja
     # so, we merge defaults and facts with
     # user-set values to get the final picture
-    user_vars.update(renderer.render_dict(user_vars))
+    user_vars.update(renderer.render_dict(**user_vars))
 
     # and we consolidate their locations (should they come from actual files)
     user_var_locations.update(locations)

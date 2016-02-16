@@ -162,11 +162,11 @@ class VarNode(Node):
 
 
 @autolog
-def render_dict(vars):
+def render_dict(**kwargs):
     """
     Render a jinja2-flavored dictionary with itself
 
-    :vars: A dictionary containing expected-to-be jinja2 strings
+    :kwargs: A dictionary containing expected-to-be jinja2 strings
     :returns: A dictionary whose string values have been rendered with jinja2
     """
 
@@ -178,7 +178,7 @@ def render_dict(vars):
     # reference other variables
     #############################################
 
-    return DepGraph(node_class=VarNode, **vars).evaluate()
+    return DepGraph(node_class=VarNode, **kwargs).evaluate()
 
 
 def _register_api(tpl_env):
