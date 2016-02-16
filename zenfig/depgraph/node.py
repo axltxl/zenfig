@@ -12,6 +12,8 @@ Node implementation
 """
 
 
+from . import DepGraphException
+
 class Node:
     """
     Graph node implementation
@@ -95,7 +97,7 @@ class Node:
 
         pass
 
-    def evaluate(self):
+    def evaluate(self, *, seen=None):
         """
         Evaluate this node (the real implementation)
 
@@ -104,6 +106,10 @@ class Node:
         all dependencies for then settle down this node's value.
         """
 
+        # To keep track of my dependency lookup I must
+        if seen is None:
+            seen = []
+
         # Don't even bother to evaluate this node if it's been
         # already evaluated.
         if self._evaluated:
@@ -111,8 +117,19 @@ class Node:
 
         # First of all, before a node's value can be evaluated,
         # its dependencies HAVE to be evaluated first
-        for node in self._deps.values():
-            node.evaluate()
+        for dep_name, dep_node in self._deps.items():
+            # at some point during dependencies evaluation, one
+            # of them could be already have been evaluated, meaning
+            # one thing: circular dependency.
+            if dep_name in seen:
+                raise DepGraphException(self._fmt_msg_circ_dep(dep_name, seen))
+
+            # If everything is good, put this dependency on the
+            # tracked ones list
+            seen.append(dep_name)
+
+            # Actually evaluate this dependency
+            dep_node.evaluate(seen=seen)
 
         # Now that all dependencies have been evaluated,
         # proceed to evaluate this node itself.
@@ -120,3 +137,11 @@ class Node:
 
         # Mark this node as evaluated
         self._evaluated = True
+
+    @staticmethod
+    def _fmt_msg_circ_dep(dep_name, seen):
+        msg_err = "Circular dependency detected! "
+        for dep in seen:
+            msg_err += "{} ~> ".format(dep)
+        msg_err += dep_name
+        return msg_err

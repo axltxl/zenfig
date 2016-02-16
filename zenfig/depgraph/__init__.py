@@ -11,3 +11,5 @@ The very basics
 
 """
 
+class DepGraphException(BaseException):
+    pass

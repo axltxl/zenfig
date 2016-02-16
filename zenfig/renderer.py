@@ -72,7 +72,8 @@ class VarNode(Node):
             # They are isolated and collected.
             for jinja_blk in REGEX_JINJA2.findall(value):
                 for var_name in REGEX_VAR.findall(value):
-                    deps.append(REGEX_VAR_STRIP.sub('', var_name))
+                    dep_name = REGEX_VAR_STRIP.sub('', var_name)
+                    deps.append(dep_name)
 
         # dict found?, its values are checked as well for any dependencies
         elif isinstance(value, dict):
