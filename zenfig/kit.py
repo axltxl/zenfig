@@ -16,12 +16,9 @@ import re
 
 from . import log
 from .util import autolog
-from .kits import git, local, InvalidKitError
+from .kits import git, local, KitException
+from .kits.git import GitRepoKit
 
-
-# Regular expression for catching git repositories
-RE_GIT_REPO_SHORT = "^[a-zA-Z0-9\-_]+\/[a-zA-Z0-9\-_]+$"
-RE_GIT_REPO_URL = "^http.*\.git$"
 
 @autolog
 def get_kit(kit_name, *, provider=None):
@@ -35,6 +32,9 @@ def get_kit(kit_name, *, provider=None):
     :param provider: Kit provider to be used to load kit_name
     :returns: a Kit holding all relevant information about kit_name
     """
+
+    # Local kit version requested by the user
+    kit_version = None
 
     # if provider has not been enforced
     # then, deduct proper provider for kit_name
@@ -51,16 +51,18 @@ def get_kit(kit_name, *, provider=None):
             provider = local
 
         # see whether kit_name matches git kit criteria
-        elif re.match(RE_GIT_REPO_SHORT, kit_name) \
-        or re.match(RE_GIT_REPO_URL, kit_name):
+        elif re.match(GitRepoKit.RE_GIT_REPO_SHORT, kit_name) \
+        or re.match(GitRepoKit.RE_GIT_REPO_URL, kit_name):
+            if re.match('.*==.*', kit_name):
+                kit_name, kit_version = kit_name.split('==')
             provider = git
 
         # when everything else fails ...
         else:
-            raise InvalidKitError(kit_name)
+            raise KitException("'{}' is not a valid provider".format(provider))
     else:
         provider = local
         log.msg_debug("Kit provider '{}' has been imposed!".format(provider))
 
     # Get a Kit instance from the provider
-    return provider.get_kit(kit_name)
+    return provider.get_kit(kit_name, kit_version)

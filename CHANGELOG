@@ -1,6 +1,12 @@
 Release 0.3.0
 -------------
 
+* [+] Kit interface: it now allows to specify versions, e.g. axltxl/i3==0.1.0
+* [+] GitKitRepo: versions are interpreted as either remote branches or tags
+* [-] GitKitRepo: it doesn't check for local repo size anymore
+* [-] GitKitRepo: it doesn't perform shallow clones anymore, only regular cloning
+      is done.
+* [-] GitKitRepo: it destroys local kit cache on error and if it is an invalid one
 * [+] Kit index variables are set as facts as well
 * [+] New fact: zenfig_version
 * [+] Renderer variable resolution revamped: New DepGraph system allows not

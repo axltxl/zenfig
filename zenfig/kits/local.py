@@ -18,7 +18,7 @@ from ..util import autolog
 
 
 @autolog
-def get_kit(kit_name):
+def get_kit(kit_name, kit_version=None):
     """Initialise kit provider"""
 
     return Kit(kit_name, root_dir=os.path.abspath(kit_name))
