@@ -17,13 +17,9 @@ from voluptuous import Schema, Optional
 
 from ..util import autolog
 
-class InvalidKitError(BaseException):
+class KitException(BaseException):
     """Basic Kit exception"""
-
-    def __init__(self, message):
-        super().__init__(
-            "{} does not have a valid file system.".format(message)
-        )
+    pass
 
 class Kit:
     """
@@ -68,8 +64,7 @@ class Kit:
         self._root_dir = root_dir
 
         # Validate file system
-        if not self.isvalid():
-            raise InvalidKitError("oh oh")
+        self._check_filesystem(self._root_dir, self._name)
 
         # Kits are compelled to have a certain file system:
         # > 2 directories:
@@ -189,12 +184,12 @@ class Kit:
         """Kit templates descriptions"""
         return self._templates
 
-    def isvalid(self):
+    @staticmethod
+    def _check_filesystem(root_dir, kit_name):
         """Check whether this kit is actually a valid one"""
-        if not os.path.isdir(self._root_dir):
-            return False
-        if not os.path.isdir("{}/templates".format(self._root_dir)):
-            return False
-        if not os.path.isdir("{}/defaults".format(self._root_dir)):
-            return False
-        return True
+        if not os.path.isdir(root_dir):
+            raise KitException("Kit '{}' doesn't have a valid base directory".format(kit_name))
+        if not os.path.isdir("{}/templates".format(root_dir)):
+            raise KitException("Kit '{}' must have a templates directory".format(kit_name))
+        if not os.path.isdir("{}/defaults".format(root_dir)):
+            raise KitException("Kit '{}' must have a defaults directory".format(kit_name))
