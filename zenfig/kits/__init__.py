@@ -148,12 +148,7 @@ class Kit:
             ]
 
             # Each template must have a specified output file
-            # this output file must be a relative path to it.
-            # zenfig will render its output to this file whose
-            # path is going to be relative to the user's home directory
             template_output_file = self._templates[template]['output_file']
-            self._templates[template]['output_file'] = \
-                    os.path.join(os.getenv("HOME"), template_output_file)
 
         # Set variable directories for this kit
         # Each kit can have default variables than can base used

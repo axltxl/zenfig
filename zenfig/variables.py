@@ -240,6 +240,7 @@ def _get_facts(*, kit):
     _create_fact(facts, 'user', os.getenv('USER'))
     _create_fact(facts, 'user_home', os.getenv('HOME'))
     _create_fact(facts, 'version', pkg_version)
+    _create_fact(facts, 'install_prefix', os.getenv('HOME'))
 
     # Kit index variables are taken as well as facts
     # so they can be referenced by other variables, also
