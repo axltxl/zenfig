@@ -17,13 +17,9 @@ from voluptuous import Schema, Optional
 
 from ..util import autolog
 
-class InvalidKitError(BaseException):
+class KitException(BaseException):
     """Basic Kit exception"""
-
-    def __init__(self, message):
-        super().__init__(
-            "{} does not have a valid file system.".format(message)
-        )
+    pass
 
 class Kit:
     """
@@ -68,8 +64,7 @@ class Kit:
         self._root_dir = root_dir
 
         # Validate file system
-        if not self.isvalid():
-            raise InvalidKitError("oh oh")
+        self._check_filesystem(self._root_dir, self._name)
 
         # Kits are compelled to have a certain file system:
         # > 2 directories:
@@ -153,18 +148,21 @@ class Kit:
             ]
 
             # Each template must have a specified output file
-            # this output file must be a relative path to it.
-            # zenfig will render its output to this file whose
-            # path is going to be relative to the user's home directory
             template_output_file = self._templates[template]['output_file']
-            self._templates[template]['output_file'] = \
-                    os.path.join(os.getenv("HOME"), template_output_file)
 
         # Set variable directories for this kit
         # Each kit can have default variables than can base used
         # all across its templates, these can be defined within
         # YAML files within its 'defaults' directory
         self._var_dirs = os.path.join(self._root_dir, 'defaults')
+
+    @property
+    def index_data(self):
+        return self._index_data
+
+    @property
+    def index_file(self):
+        return self._index_file
 
     @property
     def root_dir(self):
@@ -181,12 +179,12 @@ class Kit:
         """Kit templates descriptions"""
         return self._templates
 
-    def isvalid(self):
+    @staticmethod
+    def _check_filesystem(root_dir, kit_name):
         """Check whether this kit is actually a valid one"""
-        if not os.path.isdir(self._root_dir):
-            return False
-        if not os.path.isdir("{}/templates".format(self._root_dir)):
-            return False
-        if not os.path.isdir("{}/defaults".format(self._root_dir)):
-            return False
-        return True
+        if not os.path.isdir(root_dir):
+            raise KitException("Kit '{}' doesn't have a valid base directory".format(kit_name))
+        if not os.path.isdir("{}/templates".format(root_dir)):
+            raise KitException("Kit '{}' must have a templates directory".format(kit_name))
+        if not os.path.isdir("{}/defaults".format(root_dir)):
+            raise KitException("Kit '{}' must have a defaults directory".format(kit_name))

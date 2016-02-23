@@ -87,7 +87,7 @@ def start(*, options):
     ####################
     user_vars = variables.get_user_vars(
         user_var_files=user_var_files,
-        kit_var_dir=_kit.var_dir
+        kit=_kit
     )
 
     for template_data in _kit.templates.values():
