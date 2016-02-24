@@ -116,13 +116,13 @@ class VarNode(Node):
     def on_evaluate(self, value=None):
         """Evaluate this node"""
 
-        # no point if there are no dependencies whatsoever.
-        if not len(self.deps):
-            return
-
         # Bootstrap this thing with its first value
         if value is None:
-            self.value = self.on_evaluate(self.value)
+            return self.on_evaluate(self.value)
+
+        # no point if there are no dependencies whatsoever.
+        if not len(self.deps):
+            return self.value
 
         # Each string found will be treated with already evaluated
         # dependencies values
