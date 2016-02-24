@@ -53,6 +53,10 @@ class DepGraph:
             for dep in set(node.calc_deps()):
                 node.deps[dep] = self._nodes[dep]
 
+        # A dictionnary containing all resolved variables
+        # from this graph after they have been evaluated
+        self._resolved = {}
+
     def get_node(self, key):
         """
         Get a specific node from this graph
@@ -80,15 +84,10 @@ class DepGraph:
         """
 
         # One by one, all nodes are evaluated individually
-        for node in self._nodes.values():
-            node.evaluate()
-
-        # At this point all nodes have settled their values
-        # against their dependencies, so, a dict with these
-        # values in constructed and given back
-        graph_vars = {}
-        for name, node in self._nodes.items():
-            graph_vars[name] = node.value
+        for key, node in self._nodes.items():
+            # node.evaluate()
+            # self._resolved[key] = node.value
+            self._resolved[key] = node.evaluate()
 
         # Give that thing already!
-        return graph_vars
+        return self._resolved

@@ -95,9 +95,9 @@ class Node:
         called by its parent DepGraph evaluate() method.
         """
 
-        pass
+        raise NotImplementedError("You must implement this method")
 
-    def evaluate(self, *, seen=None):
+    def evaluate(self, *seen):
         """
         Evaluate this node (the real implementation)
 
@@ -105,15 +105,6 @@ class Node:
         at evaluation time. It basically manages to resolve
         all dependencies for then settle down this node's value.
         """
-
-        # To keep track of my dependency lookup I must
-        if seen is None:
-            seen = []
-
-        # Don't even bother to evaluate this node if it's been
-        # already evaluated.
-        if self._evaluated:
-            return
 
         # First of all, before a node's value can be evaluated,
         # its dependencies HAVE to be evaluated first
@@ -126,17 +117,24 @@ class Node:
 
             # If everything is good, put this dependency on the
             # tracked ones list
-            seen.append(dep_name)
+            seen += (dep_name,)
 
             # Actually evaluate this dependency
-            dep_node.evaluate(seen=seen)
+            dep_node.evaluate(*seen)
 
-        # Now that all dependencies have been evaluated,
-        # proceed to evaluate this node itself.
-        self.on_evaluate()
+        # Don't even bother to evaluate this node if it's been
+        # already evaluated.
+        if not self._evaluated:
 
-        # Mark this node as evaluated
-        self._evaluated = True
+            # Mark this node as evaluated
+            self._evaluated = True
+
+            # Now that all dependencies have been evaluated,
+            # proceed to evaluate this node itself.
+            self.value = self.on_evaluate()
+
+        # Finally, give back this node's value
+        return self.value
 
     @staticmethod
     def _fmt_msg_circ_dep(dep_name, seen):
