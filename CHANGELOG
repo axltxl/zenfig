@@ -1,3 +1,9 @@
+Release 0.3.1
+-------------
+
+* [FIX]: Inconsistent variable resolution fixed
+* [+] Optimizations on DepGraph
+
 Release 0.3.0
 -------------
 
