@@ -1,3 +1,8 @@
+Release 0.3.2
+-------------
+
+* [FIX] Wrong call to _cache_destroy_kit on GitRepoKit
+
 Release 0.3.1
 -------------
 

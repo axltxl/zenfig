@@ -81,7 +81,7 @@ class GitRepoKit(Kit):
 
             # Destroy kit if invalid
             if not self._cache_isvalid():
-                self._cache_destroy_kit(kit_name)
+                self._cache_destroy_kit()
             raise kit_except
 
     def _get_repo_name(self, kit_name, *, prefix=False):
