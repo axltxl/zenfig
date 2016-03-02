@@ -213,7 +213,12 @@ class GitRepoKit(Kit):
                 url=self._git_repo_url,
                 to_path=self._git_repo_path,
             )
-        except GitCommandError as gce:
+        # FIXME: though, a GitCommandError is expected
+        # to raise in case of error, there are cases in
+        # which apparently GitPython atempts to read from an
+        # inexistent stderr.
+        # source: https://github.com/gitpython-developers/GitPython/issues/383
+        except (GitCommandError, ValueError) as gce:
             if re.match(self.RE_GIT_REPO_SHORT, self._git_repo_name):
                 self._git_repo_name, self._git_repo_url = \
                         self._get_repo_name(self._git_repo_name, prefix=True)
