@@ -1,3 +1,9 @@
+Release 0.3.3
+-------------
+
+* [FIX] GitKitRepo: git.Repo.clone_from throws ValueError when it cannot read
+  from stderr
+
 Release 0.3.2
 -------------
 
