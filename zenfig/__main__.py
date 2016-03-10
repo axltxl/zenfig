@@ -27,7 +27,7 @@ from zenfig import __name__ as pkg_name, __version__ as pkg_version
 from zenfig import kit
 
 
-def parse_args(argv):
+def _parse_args(argv):
     """Usage: zenfig [-v]... [-I <varfile>]... (install|preview) <kit>
 
     -I <varfile>, --include <varfile>  Variables file/directory to include
@@ -35,7 +35,7 @@ def parse_args(argv):
     -o FILE, --output-file FILE  Output file
     """
 
-    return docopt(parse_args.__doc__, argv=argv, version=pkg_version)
+    return docopt(_parse_args.__doc__, argv=argv, version=pkg_version)
 
 
 def _splash():
@@ -49,7 +49,7 @@ def _splash():
         .format(pkg_url), colorf=log.yellow, bold=True
     )
 
-def start(*, options):
+def _start(*, options):
     """
     The main thing
 
@@ -142,7 +142,7 @@ def _handle_except(e):
     return 1
 
 
-def main(argv=None):
+def _main(argv=None):
     """
     This is the main thread of execution
 
@@ -159,7 +159,7 @@ def main(argv=None):
 
     try:
         # start the thing!
-        start(options=parse_args(argv))
+        _start(options=_parse_args(argv))
     except DocoptExit as dexcept:
         # Deal with wrong arguments
         print(dexcept)
@@ -177,4 +177,4 @@ def main(argv=None):
 # The remedy is to let main()'s return value specify the
 # exit status.
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(_main())
