@@ -1,2 +1,7 @@
-Milestone 0.2:
-* Consolidate template trimming
+Milestone 0.4:
+* New default variables:
+    * font_hintstyle
+* Handle undefined variables
+* New command: print. Print a variable to stdout.
+* zenfig as python module: public entry get_vars (we'll see about this)
+* Change output_file key to dest in index schema
