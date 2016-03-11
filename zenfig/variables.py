@@ -28,7 +28,7 @@ ZF_VAR_PATH_REGEX = "([^:]+:)*[^:]+$"
 
 
 @autolog
-def _get_vars_from_env(var_path=None):
+def _get_search_path_from_env(var_path=None):
     """
     Get variable search paths from environment variable ZF_VAR_PATH (if any)
 
@@ -73,7 +73,7 @@ def _resolve_search_path(*, user_var_files, kit_var_dir=None):
     # be set, then it will be taken into
     # account for variables search path
     ################################
-    env_vars = _get_vars_from_env()
+    env_vars = _get_search_path_from_env()
     if env_vars is not None:
         user_var_files.extend(env_vars)
 
