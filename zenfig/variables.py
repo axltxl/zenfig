@@ -320,14 +320,14 @@ def get_user_vars(*, user_var_files, kit):
     user_var_locations.update(locations)
 
     # Print vars
-    list_vars(vars=user_vars, locations=user_var_locations)
+    _list_vars(vars=user_vars, locations=user_var_locations)
 
     # Give variables already!
     return user_vars
 
 
 @autolog
-def list_vars(*, vars, locations):
+def _list_vars(*, vars, locations):
     """Print all vars given"""
 
     log.msg("{} variable(s) captured".format(len(vars)))
