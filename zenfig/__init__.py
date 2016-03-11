@@ -17,3 +17,5 @@ __author__ = 'Alejandro Ricoveri'
 __version__ = '0.3.5'
 __licence__ = 'MIT'
 __copyright__ = 'Copyright (c) Alejandro Ricoveri'
+
+from .variables import get_user_vars

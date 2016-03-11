@@ -20,6 +20,8 @@ from . import __version__ as pkg_version
 from . import log
 from . import util
 from . import renderer
+from .kit import get_kit
+from .kits import Kit
 from .util import autolog
 
 
@@ -223,7 +225,7 @@ def _create_fact(facts, key, value, *, prefix=None):
 
 
 @autolog
-def _get_facts(*, kit):
+def _get_facts(*, kit=None):
     """
     Get facts
 
@@ -249,15 +251,16 @@ def _get_facts(*, kit):
     # this means that index variables from a kit can reference
     # other variables as well, because all these variables get
     # rendered as part of variable resolution.
-    for key, value in kit.index_data.items():
-        _create_fact(facts, key, value, prefix="{}_{}".format(pkg_name, "kit"))
+    if kit is not None:
+        for key, value in kit.index_data.items():
+            _create_fact(facts, key, value, prefix="{}_{}".format(pkg_name, "kit"))
 
     # Give those variables already!
     return facts
 
 
 @autolog
-def get_user_vars(*, user_var_files, kit):
+def get_user_vars(*, user_var_files=None, kit=None):
     """
     Resolve variables from user environment
 
@@ -270,6 +273,21 @@ def get_user_vars(*, user_var_files, kit):
     :param user_var_files: Variable search paths set by the user
     :param kit: Kit to be sourced
     """
+
+    # user var locations can be None
+    if user_var_files is None:
+        user_var_files = []
+
+    # Where is that kit's variable directory?
+    kit_var_dir = None
+
+    # Get kit (if any)
+    if kit is not None  and not isinstance(kit, Kit):
+        if isinstance(kit, str):
+            kit = get_kit(kit)
+            kit_var_dir = kit.var_dir
+        else:
+            raise TypeError("kit must be either a str or a Kit")
 
     #######################################################
     # User variables get initialised with default variables
@@ -285,7 +303,7 @@ def get_user_vars(*, user_var_files, kit):
     ##########################
     user_var_files = _resolve_search_path(
         user_var_files=user_var_files,
-        kit_var_dir=kit.var_dir
+        kit_var_dir=kit_var_dir
     )
     log.msg_debug("Variables search path:")
     log.msg_debug("**********************")
