@@ -142,7 +142,7 @@ def _handle_except(e):
     return 1
 
 
-def _main(argv=None):
+def main(argv=None):
     """
     This is the main thread of execution
 
@@ -177,4 +177,4 @@ def _main(argv=None):
 # The remedy is to let main()'s return value specify the
 # exit status.
 if __name__ == '__main__':
-    sys.exit(_main())
+    sys.exit(main())
