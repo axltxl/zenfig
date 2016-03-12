@@ -278,16 +278,18 @@ def get_user_vars(*, user_var_files=None, kit=None):
     if user_var_files is None:
         user_var_files = []
 
-    # Where is that kit's variable directory?
+    # Kit variables directory
     kit_var_dir = None
 
     # Get kit (if any)
-    if kit is not None  and not isinstance(kit, Kit):
+    if kit is not None:
         if isinstance(kit, str):
             kit = get_kit(kit)
-            kit_var_dir = kit.var_dir
-        else:
+        elif not isinstance(kit, Kit):
             raise TypeError("kit must be either a str or a Kit")
+
+        # Where is that kit's variable directory?
+        kit_var_dir = kit.var_dir
 
     #######################################################
     # User variables get initialised with default variables
