@@ -1,3 +1,9 @@
+Release 0.4.3
+-------------
+
+* [FIX] Kit variables directory was not being consistently set at variable
+  resolution
+
 Release 0.4.2
 -------------
 
