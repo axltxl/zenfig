@@ -156,6 +156,7 @@ def _get_default_vars():
         "font_antialiasing": True,
         "font_hinting": True,
         "font_hintstyle": "hintslight",
+        "font_antialias": True
     }
 
     # Insert on defaults
