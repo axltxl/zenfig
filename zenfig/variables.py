@@ -20,6 +20,8 @@ from . import __version__ as pkg_version
 from . import log
 from . import util
 from . import renderer
+from .kit import get_kit
+from .kits import Kit
 from .util import autolog
 
 
@@ -28,7 +30,7 @@ ZF_VAR_PATH_REGEX = "([^:]+:)*[^:]+$"
 
 
 @autolog
-def _get_vars_from_env(var_path=None):
+def _get_search_path_from_env(var_path=None):
     """
     Get variable search paths from environment variable ZF_VAR_PATH (if any)
 
@@ -73,7 +75,7 @@ def _resolve_search_path(*, user_var_files, kit_var_dir=None):
     # be set, then it will be taken into
     # account for variables search path
     ################################
-    env_vars = _get_vars_from_env()
+    env_vars = _get_search_path_from_env()
     if env_vars is not None:
         user_var_files.extend(env_vars)
 
@@ -223,7 +225,7 @@ def _create_fact(facts, key, value, *, prefix=None):
 
 
 @autolog
-def _get_facts(*, kit):
+def _get_facts(*, kit=None):
     """
     Get facts
 
@@ -249,15 +251,16 @@ def _get_facts(*, kit):
     # this means that index variables from a kit can reference
     # other variables as well, because all these variables get
     # rendered as part of variable resolution.
-    for key, value in kit.index_data.items():
-        _create_fact(facts, key, value, prefix="{}_{}".format(pkg_name, "kit"))
+    if kit is not None:
+        for key, value in kit.index_data.items():
+            _create_fact(facts, key, value, prefix="{}_{}".format(pkg_name, "kit"))
 
     # Give those variables already!
     return facts
 
 
 @autolog
-def get_user_vars(*, user_var_files, kit):
+def get_user_vars(*, user_var_files=None, kit=None):
     """
     Resolve variables from user environment
 
@@ -270,6 +273,21 @@ def get_user_vars(*, user_var_files, kit):
     :param user_var_files: Variable search paths set by the user
     :param kit: Kit to be sourced
     """
+
+    # user var locations can be None
+    if user_var_files is None:
+        user_var_files = []
+
+    # Where is that kit's variable directory?
+    kit_var_dir = None
+
+    # Get kit (if any)
+    if kit is not None  and not isinstance(kit, Kit):
+        if isinstance(kit, str):
+            kit = get_kit(kit)
+            kit_var_dir = kit.var_dir
+        else:
+            raise TypeError("kit must be either a str or a Kit")
 
     #######################################################
     # User variables get initialised with default variables
@@ -285,7 +303,7 @@ def get_user_vars(*, user_var_files, kit):
     ##########################
     user_var_files = _resolve_search_path(
         user_var_files=user_var_files,
-        kit_var_dir=kit.var_dir
+        kit_var_dir=kit_var_dir
     )
     log.msg_debug("Variables search path:")
     log.msg_debug("**********************")
@@ -320,14 +338,14 @@ def get_user_vars(*, user_var_files, kit):
     user_var_locations.update(locations)
 
     # Print vars
-    list_vars(vars=user_vars, locations=user_var_locations)
+    _list_vars(vars=user_vars, locations=user_var_locations)
 
     # Give variables already!
     return user_vars
 
 
 @autolog
-def list_vars(*, vars, locations):
+def _list_vars(*, vars, locations):
     """Print all vars given"""
 
     log.msg("{} variable(s) captured".format(len(vars)))
