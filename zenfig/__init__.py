@@ -14,6 +14,8 @@ The very basics
 PKG_URL = 'https://github.com/axltxl/zenfig'
 __name__ = 'zenfig'
 __author__ = 'Alejandro Ricoveri'
-__version__ = '0.3.5'
+__version__ = '0.4.0'
 __licence__ = 'MIT'
 __copyright__ = 'Copyright (c) Alejandro Ricoveri'
+
+from .variables import get_user_vars
