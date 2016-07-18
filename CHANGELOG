@@ -1,3 +1,7 @@
+Release 0.5.0
+-------------
+* Removed prefix-base repository lookups on git kit driver
+
 Release 0.4.3
 -------------
 
