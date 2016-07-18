@@ -84,24 +84,16 @@ class GitRepoKit(Kit):
                 self._cache_destroy_kit()
             raise kit_except
 
-    def _get_repo_name(self, kit_name, *, prefix=False):
+    def _get_repo_name(self, kit_name):
         """Generate repo name and its URL"""
 
         if not re.match(self.RE_GIT_REPO_URL, kit_name):
             # We asume <user_name>/<repo_name> came by
             git_repo_prefix, git_repo_name = kit_name.split('/')
-
-            if prefix:
-                # try zenfig- prefix on git repo, first
-                git_repo_url = "{}/{}/zenfig-{}.git".format(
-                    self.GIT_REPO_PREFIX_DEFAULT,
-                    git_repo_prefix, git_repo_name
-                )
-            else:
-                git_repo_url = "{}/{}/{}.git".format(
-                    self.GIT_REPO_PREFIX_DEFAULT,
-                    git_repo_prefix, git_repo_name
-                )
+            git_repo_url = "{}/{}/{}.git".format(
+                self.GIT_REPO_PREFIX_DEFAULT,
+                git_repo_prefix, git_repo_name
+            )
             return (kit_name, git_repo_url)
         return (
             # Should received kit_name be a plain URL, its name would be
@@ -213,22 +205,6 @@ class GitRepoKit(Kit):
                 url=self._git_repo_url,
                 to_path=self._git_repo_path,
             )
-        # FIXME: though, a GitCommandError is expected
-        # to raise in case of error, there are cases in
-        # which apparently GitPython atempts to read from an
-        # inexistent stderr.
-        # source: https://github.com/gitpython-developers/GitPython/issues/383
-        except (GitCommandError, ValueError) as gce:
-            if re.match(self.RE_GIT_REPO_SHORT, self._git_repo_name):
-                self._git_repo_name, self._git_repo_url = \
-                        self._get_repo_name(self._git_repo_name, prefix=True)
-                log.msg_warn("Cloning kit repository: {}".format(self._git_repo_url))
-                return git.Repo.clone_from(
-                    url=self._git_repo_url,
-                    to_path=self._git_repo_path,
-                )
-            else:
-                raise gce
         except:
             raise KitException(
                 "Unable to clone kit repository at {}"
