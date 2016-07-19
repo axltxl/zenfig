@@ -13,7 +13,10 @@ Variables processor
 
 import os
 import re
+import platform
 import yaml
+import psutil
+import cpuinfo
 
 from . import __name__ as pkg_name
 from . import __version__ as pkg_version
@@ -239,12 +242,73 @@ def _get_facts(*, kit=None):
     # these are the facts
     facts = {}
 
-    _create_fact(facts, 'env', dict(os.environ))
-    _create_fact(facts, 'sys_path', os.getenv("PATH").split(":"))
-    _create_fact(facts, 'user', os.getenv('USER'))
-    _create_fact(facts, 'user_home', os.getenv('HOME'))
+    # General facts that are available for every platform
     _create_fact(facts, 'version', pkg_version)
     _create_fact(facts, 'install_prefix', os.getenv('HOME'))
+
+    # General system-related facts
+    _create_fact(facts, 'sys_uid', os.getuid())
+    _create_fact(facts, 'sys_gid', os.getgid())
+
+    # A collection of current environment variables is held in here
+    _create_fact(facts, 'env', dict(os.environ))
+
+    # Facts for *nix operating systems
+    _create_fact(facts, 'sys_path', os.getenv("PATH").split(":"))
+    if os.name == 'posix':
+        _create_fact(facts, 'sys_user', os.getenv('USER'))
+        _create_fact(facts, 'sys_user_home', os.getenv('HOME'))
+
+    ####################################################
+    # System-related facts:
+    # ---------------------
+    # These facts collect characteristics of the current
+    # platform zenfig is running on
+    ####################################################
+
+    # Operating System facts
+    _system = platform.system()
+    _create_fact(facts, 'system', _system)
+    _create_fact(facts, 'sys_node', platform.node())
+
+    # These are exclusive to linux-based systems
+    if _system == 'Linux':
+        linux_distro = platform.linux_distribution()
+        _create_fact(facts, 'linux_dist_name', linux_distro[0])
+        _create_fact(facts, 'linux_dist_version', linux_distro[1])
+        _create_fact(facts, 'linux_dist_id', linux_distro[2])
+
+        # kernel version
+        _create_fact(facts, 'linux_release', platform.release())
+
+    # OSX-specific facts
+    if _system == 'Darwin':
+        _create_fact(facts, 'osx_ver', platform.mac_ver())
+
+    # Hardware-related facts
+    _create_fact(facts, 'sys_machine', platform.machine())
+
+    # Low level CPU information (thanks to cpuinfo)
+    _cpu_info = cpuinfo.get_cpu_info()
+    _create_fact(facts, 'cpu_vendor_id', _cpu_info['vendor_id'])
+    _create_fact(facts, 'cpu_brand', _cpu_info['brand'])
+    _create_fact(facts, 'cpu_cores', _cpu_info['count'])
+    _create_fact(facts, 'cpu_hz', _cpu_info['hz_advertised_raw'][0])
+    _create_fact(facts, 'cpu_arch', _cpu_info['arch'])
+    _create_fact(facts, 'cpu_bits', _cpu_info['bits'])
+
+    # RAM information
+    _create_fact(facts, 'mem_total', psutil.virtual_memory()[0])
+
+    ####################
+    # Python information
+    ####################
+    _py_ver = platform.python_version_tuple()
+    _create_fact(facts, 'python_implementation', platform.python_revision())
+    _create_fact(facts, 'python_version', platform.python_version())
+    _create_fact(facts, 'python_version_major', _py_ver[0])
+    _create_fact(facts, 'python_version_minor', _py_ver[1])
+    _create_fact(facts, 'python_version_patch', _py_ver[2])
 
     # Kit index variables are taken as well as facts
     # so they can be referenced by other variables, also
