@@ -1,5 +1,37 @@
 Release 0.5.0
 -------------
+* zenfig_user_home: fact has been changed to zenfig_sys_user_home
+* [+] New user-specific system facts: zenfig_sys_uid and zenfig_sys_gid
+* [+] A bunch of scattered platform-specific facts are extracted and set as facts.
+   These includes facts that vary from OS, CPU and memory information about the
+   machine zenfig is running on. New facts on this matter are the following:
+   - zenfig_sys_node: system node name
+   - zenfig_sys_machine
+   - zenfig_system: system name
+   + Linux specific
+     - zenfig_linux_dist_name
+     - zenfig_linux_dist_version
+     - zenfig_linux_dist_id
+     - zenfig_linux_release
+  + OSX-specific
+    - zenfig_osx_ver
+  + CPU-specific
+    - zenfig_cpu_vendor_id
+    - zenfig_cpu_brand
+    - zenfig_cpu_cores
+    - zenfig_cpu_hz
+    - zenfig_cpu_arch
+    - zenfig_cpu_bits
+  + Memory information
+    - zenfig_mem_total: total memory in bytes
+  + Python interpreter information
+    - zenfig_python_implementation
+    - zenfig_python_version
+    - zenfig_python_major
+    - zenfig_python_minor
+    - zenfig_python_patch
+
+
 * Removed prefix-base repository lookups on git kit driver
 
 Release 0.4.3
