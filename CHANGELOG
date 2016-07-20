@@ -1,8 +1,12 @@
+Release 0.5.1
+-------------
+* [+] New filter: bool2str
+
 Release 0.5.0
 -------------
 * Artificial values insertion: if a variable is dependent on non-existent ones, the
   latter will rely on created artificial dependencies whose value is going to be a string
-  following the pattern "{{dependency_name}}_NotImplemented". Should this be the case, a 
+  following the pattern "{{dependency_name}}_NotImplemented". Should this be the case, a
   warning will be raised by zenfig before creating artificial variables.
 * zenfig_user_home: fact has been changed to zenfig_sys_user_home
 * [+] New user-specific system facts: zenfig_sys_uid and zenfig_sys_gid
