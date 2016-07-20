@@ -1,7 +1,3 @@
-Milestone 0.4:
-* New default variables:
-    * font_hintstyle
-* Handle undefined variables
+Milestone 0.6:
 * New command: print. Print a variable to stdout.
-* zenfig as python module: public entry get_vars (we'll see about this)
 * Change output_file key to dest in index schema
