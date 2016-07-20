@@ -11,7 +11,7 @@ Dependency graph implementation
 
 """
 
-
+from .. import log
 from .node import Node
 
 
@@ -51,7 +51,18 @@ class DepGraph:
         # create dependency relationships among them
         for node in self._nodes.values():
             for dep in set(node.calc_deps()):
-                node.deps[dep] = self._nodes[dep]
+                if dep in self._nodes:
+                    node.deps[dep] = self._nodes[dep]
+                else:
+                    # Insert an artificial node with a null value:
+                    # This means this node is depending on a variables
+                    # that hasn't been defined in any way or any variable file.
+                    # Normally, this would be enough reason to trigger an exception,
+                    # but the thing is that it is simply obnoxious for the user,
+                    # so instead, a warning is raised and a node whose value is
+                    # an empty string is inserted.
+                    log.msg_warn("'{}' is required by '{}' but it is not defined anywhere!.".format(dep, node.key))
+                    node.deps[dep] = node_class(dep, "{}_NotImplemented".format(dep), depgraph=self)
 
         # A dictionnary containing all resolved variables
         # from this graph after they have been evaluated

@@ -5,4 +5,6 @@ Jinja2     == 2.8
 docopt     == 0.6.2
 clint      == 0.5.1
 voluptuous == 0.8.8
+psutil     == 4.3.0
+py-cpuinfo == 0.2.3
 

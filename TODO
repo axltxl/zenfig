@@ -1,7 +1,10 @@
-Milestone 0.4:
-* New default variables:
-    * font_hintstyle
-* Handle undefined variables
+Milestone 0.6:
+--------------
 * New command: print. Print a variable to stdout.
-* zenfig as python module: public entry get_vars (we'll see about this)
+* Isolated mode: run zenfig only taking default variables and facts (including defaults from the kit being used)
 * Change output_file key to dest in index schema
+* A more practical user variable directory: move it from ~/.local/share to ~/.zenfig
+
+Milestone 0.7:
+--------------
+* Proper kit schema marshalling
