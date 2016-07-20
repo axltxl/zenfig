@@ -61,4 +61,5 @@ def get_filters():
 # Bring all API functions so they are all registered
 # in no time
 ####################################################
+from . import utils
 from . import color
