@@ -11,7 +11,7 @@ Dependency graph implementation
 
 """
 
-
+from .. import log
 from .node import Node
 
 
