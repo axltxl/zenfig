@@ -1,3 +1,7 @@
+Release 0.5.2
+-------------
+* [+] Jinja2 extensions added: do, loopcontrols, with_
+
 Release 0.5.1
 -------------
 * [+] New filter: bool2str
