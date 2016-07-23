@@ -6,6 +6,12 @@ Release 0.6.0
   zenfig will discard any variable file locations set by the user.
 * [+] log_msg_* global functions for template-level access :)
 
+Release 0.5.3
+-------------
+
+* [FIX] YAML files are checked for integrity before being processed. Their root
+  structure must be dictionary, otherwise, they are discarded.
+
 Release 0.5.2
 -------------
 

@@ -472,10 +472,21 @@ def _get_vars(*, var_files):
                 # Update variables with those found
                 # on this file
                 try:
+
+                    # Load the YAML file
                     vars = yaml.load(f)
-                    tpl_vars.update(vars)
+
+                    # Check whether there is indeed something inside the YAML file
+                    if not isinstance(vars, dict):
+                        log.msg_err("Invalid document format on file '{}'. "
+                            "Root YAML structure must be a dictionary. "
+                            "This file has been discarded.".format(var_file))
+                        continue
+
                     # And update locations in which these
                     # variables were found
+                    tpl_vars.update(vars)
+
                     for var in vars.keys():
                         tpl_files[var] = var_file
 
