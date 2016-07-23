@@ -1,3 +1,9 @@
+Release 0.5.3
+-------------
+
+* [FIX] YAML files are checked for integrity before being processed. Their root
+  structure must be dictionary, otherwise, they are discarded.
+
 Release 0.5.2
 -------------
 * [+] Jinja2 extensions added: do, loopcontrols, with_
