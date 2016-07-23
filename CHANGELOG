@@ -1,3 +1,8 @@
+Release 0.6.0
+-------------
+* [+] defaults only mode: if -x or --defaults-only is specificied at the command line,
+  zenfig will discard any variable file locations set by the user.
+
 Release 0.5.2
 -------------
 * [+] Jinja2 extensions added: do, loopcontrols, with_
