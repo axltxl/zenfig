@@ -1,9 +1,6 @@
 Milestone 0.6:
 --------------
 * New command: print. Print a variable to stdout.
-* Isolated mode: run zenfig only taking default variables and facts (including defaults from the kit being used)
-  Flag parameter name: --only-defaults -x
-* Change output_file key to dest in index schema
 * A more practical user variable directory: move it from ~/.local/share to ~/.zenfig
 * log messages as filters: log_msg, log_msg_warn, log_msg_err. This will allow templates to log output.
 
