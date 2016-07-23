@@ -49,11 +49,12 @@ def _get_search_path_from_env(var_path=None):
 
 
 @autolog
-def _resolve_search_path(*, user_var_files, kit_var_dir=None):
+def _resolve_search_path(*, user_var_files, kit_var_dir=None, defaults_only=False):
     """
     Resolve variable search path
 
     :param user_var_files: Raw list of variable locations set by the user
+    :param defaults_only: If True, variable locations set by the user won't be included.
     :returns:
         A list of variable locations/files, ordered by precedence
     """
@@ -63,37 +64,35 @@ def _resolve_search_path(*, user_var_files, kit_var_dir=None):
     # precedence as follows
     ########################################
 
-    #####################################
-    # 1 => Variables set by the user
-    # Make sure we have absolute paths to
-    # all variable files and/or directories
-    #####################################
-    for i, var_file in enumerate(user_var_files):
-        user_var_files[i] = os.path.abspath(user_var_files[i])
+    if not defaults_only:
+        #####################################
+        # 1 => Variables set by the user
+        # Make sure we have absolute paths to
+        # all variable files and/or directories
+        #####################################
+        for i, var_file in enumerate(user_var_files):
+            user_var_files[i] = os.path.abspath(user_var_files[i])
 
-    ################################
-    # 2 => Variables set in ZF_VAR_PATH
-    # Add entries in ZF_VAR_PATH:
-    # Should this environment variable
-    # be set, then it will be taken into
-    # account for variables search path
-    ################################
-    env_vars = _get_search_path_from_env()
-    if env_vars is not None:
-        user_var_files.extend(env_vars)
+        ################################
+        # 2 => Variables set in ZF_VAR_PATH
+        # Add entries in ZF_VAR_PATH:
+        # Should this environment variable
+        # be set, then it will be taken into
+        # account for variables search path
+        ################################
+        env_vars = _get_search_path_from_env()
+        if env_vars is not None:
+            user_var_files.extend(env_vars)
+
+        ########################################
+        # 3 => Variables set in default vars dir
+        # Add user data home into the search path
+        ########################################
+        user_vars_dir = "{}/vars".format(util.get_data_home())
+        user_var_files.append(user_vars_dir)
 
     ########################################
-    # 3 => Variables set in default vars dir
-    # Add XDG_DATA_HOME/zenfig/vars into the
-    # search path
-    ########################################
-    xdg_variables_dir = "{}/vars".format(util.get_xdg_data_home())
-    user_var_files.append(xdg_variables_dir)
-
-    ########################################
-    # 4 => Default variables set by the package
-    # (if specified) in
-    # XDG_CACHE_HOME/zenfig/<package>/defaults
+    # 4 => Default variables set by the kit
     ########################################
     if kit_var_dir is not None:
         user_var_files.append(kit_var_dir)
@@ -324,7 +323,7 @@ def _get_facts(*, kit=None):
 
 
 @autolog
-def get_user_vars(*, user_var_files=None, kit=None):
+def get_user_vars(*, user_var_files=None, kit=None, defaults_only=False):
     """
     Resolve variables from user environment
 
@@ -336,6 +335,7 @@ def get_user_vars(*, user_var_files=None, kit=None):
 
     :param user_var_files: Variable search paths set by the user
     :param kit: Kit to be sourced
+    :param defaults_only: If True, variable locations set by the user won't be included.
     """
 
     # user var locations can be None
@@ -369,7 +369,8 @@ def get_user_vars(*, user_var_files=None, kit=None):
     ##########################
     user_var_files = _resolve_search_path(
         user_var_files=user_var_files,
-        kit_var_dir=kit_var_dir
+        kit_var_dir=kit_var_dir,
+        defaults_only=defaults_only
     )
     log.msg_debug("Variables search path:")
     log.msg_debug("**********************")

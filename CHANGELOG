@@ -1,3 +1,11 @@
+Release 0.6.0
+-------------
+
+* [~] ZENFIG_HOME has been moved from XDG_DATA_HOME/zenfig to HOME/.zenfig for easiness of use.
+* [+] defaults only mode: if -x or --defaults-only is specificied at the command line,
+  zenfig will discard any variable file locations set by the user.
+* [+] log_msg_* global functions for template-level access :)
+
 Release 0.5.3
 -------------
 
@@ -6,14 +14,17 @@ Release 0.5.3
 
 Release 0.5.2
 -------------
+
 * [+] Jinja2 extensions added: do, loopcontrols, with_
 
 Release 0.5.1
 -------------
+
 * [+] New filter: bool2str
 
 Release 0.5.0
 -------------
+
 * Artificial values insertion: if a variable is dependent on non-existent ones, the
   latter will rely on created artificial dependencies whose value is going to be a string
   following the pattern "{{dependency_name}}_NotImplemented". Should this be the case, a
@@ -83,7 +94,6 @@ Release 0.3.4
 -------------
 
 * [+] New fact: font_hintstyle
-=======
 
 Release 0.3.3
 -------------

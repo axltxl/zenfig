@@ -28,11 +28,11 @@ from zenfig import kit
 
 
 def _parse_args(argv):
-    """Usage: zenfig [-v]... [-I <varfile>]... (install|preview) <kit>
+    """Usage: zenfig [-x] [-v]... [-I <varfile>]... (install|preview) <kit>
 
     -I <varfile>, --include <varfile>  Variables file/directory to include
     -v  Output verbosity
-    -o FILE, --output-file FILE  Output file
+    -x, --defaults-only                Discard any variable locations set by the user
     """
 
     return docopt(_parse_args.__doc__, argv=argv, version=pkg_version)
@@ -87,7 +87,8 @@ def _start(*, options):
     ####################
     user_vars = variables.get_user_vars(
         user_var_files=user_var_files,
-        kit=_kit
+        kit=_kit,
+        defaults_only=options['--defaults-only'],
     )
 
     for template_data in _kit.templates.values():

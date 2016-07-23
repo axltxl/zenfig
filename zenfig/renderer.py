@@ -229,11 +229,11 @@ def render_file(*, vars, template_file, output_file, template_include_dirs):
         key=lambda x: template_include_dirs.index(x)
     )
 
-    # XDG_DATA_HOME/templates is also added to the template search path:
+    # ZENFIG_HOME/templates is also added to the template search path:
     # This is mostly because there are kits that offer the user to include
     # his own custom templates as a means of customization and expansion.
     template_include_dirs.append(
-        os.path.join(util.get_xdg_data_home(), 'templates')
+        os.path.join(util.get_data_home(), 'templates')
     )
 
     log.msg_debug("Template search path:")
@@ -251,6 +251,8 @@ def render_file(*, vars, template_file, output_file, template_include_dirs):
         keep_trailing_newline=True,
         line_comment_prefix="#",
         line_statement_prefix="%",
+
+        # jinja2 extension for the masses
         extensions = [
             'jinja2.ext.do',
             'jinja2.ext.loopcontrols',
