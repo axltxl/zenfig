@@ -251,6 +251,8 @@ def render_file(*, vars, template_file, output_file, template_include_dirs):
         keep_trailing_newline=True,
         line_comment_prefix="#",
         line_statement_prefix="%",
+
+        # jinja2 extension for the masses
         extensions = [
             'jinja2.ext.do',
             'jinja2.ext.loopcontrols',
