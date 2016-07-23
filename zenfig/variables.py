@@ -86,11 +86,10 @@ def _resolve_search_path(*, user_var_files, kit_var_dir=None, defaults_only=Fals
 
         ########################################
         # 3 => Variables set in default vars dir
-        # Add XDG_DATA_HOME/zenfig/vars into the
-        # search path
+        # Add user data home into the search path
         ########################################
-        xdg_variables_dir = "{}/vars".format(util.get_xdg_data_home())
-        user_var_files.append(xdg_variables_dir)
+        user_vars_dir = "{}/vars".format(util.get_data_home())
+        user_var_files.append(user_vars_dir)
 
     ########################################
     # 4 => Default variables set by the kit

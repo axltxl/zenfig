@@ -1,7 +1,6 @@
 Milestone 0.6:
 --------------
 * New command: print. Print a variable to stdout.
-* A more practical user variable directory: move it from ~/.local/share to ~/.zenfig
 * log messages as filters: log_msg, log_msg_warn, log_msg_err. This will allow templates to log output.
 
 Milestone 0.7:
