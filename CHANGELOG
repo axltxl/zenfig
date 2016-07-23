@@ -4,6 +4,7 @@ Release 0.6.0
 * [~] ZENFIG_HOME has been moved from XDG_DATA_HOME/zenfig to HOME/.zenfig for easiness of use.
 * [+] defaults only mode: if -x or --defaults-only is specificied at the command line,
   zenfig will discard any variable file locations set by the user.
+* [+] log_msg_* global functions for template-level access :)
 
 Release 0.5.2
 -------------
