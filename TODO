@@ -1,3 +1,12 @@
 Milestone 0.7:
 --------------
 * Proper kit schema marshalling
+* Plugin architecture:
+  - Rename Kits to Plugins
+  - Plugins comprise a whole templating package,
+    including custom python code.
+  - Plugins can hold python code on a single file at <plugin_root_dir>/plugin.py
+  - plugin.py must only hold an instance of zenfig.Plugin
+  - zenfig.Plugin wraps up all general code needed for a plugin to run python code
+  - instances of zenfig.Plugin can inherit callbacks for each event going on all
+    phases of zenfig execution: on_render, on_pre_render, on_post_render.
